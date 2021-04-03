@@ -33,9 +33,9 @@ return (x);
  * Return: the length(x)
  */
 
-int _strlen(char *s)
+size_t _strlen(char *s)
 {
-int x;
+size_t x;
 x = 0;
 while (*(s + x) != '\0')
 {
@@ -89,23 +89,4 @@ return;
 int _putchar(char c)
 {
 return (write(1, &c, 1));
-}
-#include "holberton.h"
-
-/**
- * _memcpy - copy one file to another
- * @n: the measure of the copy
- * @dest: destination for copy
- * @src: source to copy
- * Return: dest(ination)
- */
-
-char *_memcpy(char *dest, char *src, unsigned int n)
-{
-unsigned int x;
-for (x = 0; x < n; x++)
-{
-dest[x] = src[x];
-}
-return (dest);
 }

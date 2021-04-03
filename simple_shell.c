@@ -1,9 +1,10 @@
 #include "shlib.h"
 
 /**
- *
- *
- *
+ * main - simple shell
+ * @argc: arg count
+ * @argv: arg list
+ * Return: returns 1 for success -1 for failure
  */
 int main(int argc, char **argv)
 {
