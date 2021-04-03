@@ -11,5 +11,10 @@
 void print_prompt1(void);
 void print_prompt2(void);
 char *read_cmd(void);
+int _putchar(char c);
+char *_memcpy(char *dest, char *src, unsigned int n);
+int _strcmp(char *s1, char *s2);
+void _puts(char *str);
+int _strlen(char *s);
 
 #endif
