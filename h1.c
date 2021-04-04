@@ -5,45 +5,44 @@
  */
 char *read_cmd(void)
 {
-	char *buf, *ptr = NULL, *ptr2, ptrlen = 0;
+	char *buf = NULL, *ptr = NULL, ptrlen = 0, *ptr2 = NULL;
 	size_t buflen, bsz = 1024;
 
 	while (getline(&buf, &bsz, stdin))
 	{
-		printf("before buflen assignment\n");
 		buflen = _strlen(buf);
-		printf("Were in the loop\n");
-		if (!ptr)
+		if (ptr == NULL)
 		{
 			ptr = malloc(sizeof(char) * (buflen + 1));
-			printf("pointer malloced\n");
-		}
-		else
-		{
-			ptr2 = _realloc(ptr, buflen, ptrlen + buflen + 1);
-			printf("pointer realloced\n");
-			if (ptr2)
-				ptr = ptr2;
-			else
+			if (ptr == NULL)
 			{
-				free(ptr);
-				ptr = NULL;
-				return (ptr);
+				free(buf);
+				return (NULL);
 			}
 		}
+		else if (ptr != NULL)
+		{
+			ptr2 = _realloc(ptr, buflen, ptrlen + buflen);
+			if (ptr2 == NULL)
+			{
+				free(ptr), free(buf);
+				return (NULL);
+			}
+			ptr = ptr2;
+		}
 		_strcpy(ptr + ptrlen, buf);
-		printf("pointer copied\n");
 		if (buf[buflen - 1] == '\n')
 		{
 			if (buflen == 1 || buf[buflen - 2] != '\\')
+			{
+				free(buf), ptr[buflen] = 00;
 				return (ptr);
-			ptr[ptrlen + buflen - 2] = '\0';
-			buflen -= 2;
-			print_prompt2();
+			}
+			ptr[ptrlen + buflen - 2] = 00, buflen -= 2, print_prompt2();
 		}
-		printf("after new line check, start of new loop\n");
 		ptrlen += buflen;
 	}
+free(ptr2), free(buf);
 return (ptr);
 }
 

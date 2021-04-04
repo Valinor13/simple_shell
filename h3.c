@@ -1,6 +1,7 @@
 #include "shlib.h"
 /**
  * _realloc - reallocate memory
+ * @ptr: input pointer for new malloc
  * @olen: the old length malloc'd
  * @nlen: the new length required
  * Return: a pointer to new space
