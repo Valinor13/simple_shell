@@ -5,15 +5,15 @@
  */
 char *read_cmd(void)
 {
-	char *buf = NULL, *ptr = NULL, ptrlen = 0, *ptr2 = NULL;
-	size_t buflen, bsz = 1024;
+	char *buf = NULL, *ptr = NULL;
+	size_t buflen, bsz = 1024, ptrlen = 0;
 
 	while (getline(&buf, &bsz, stdin))
 	{
 		buflen = _strlen(buf);
 		if (ptr == NULL)
 		{
-			ptr = malloc(sizeof(char) * (buflen + 1));
+			ptr = malloc(sizeof(char) * (buflen) + 1);
 			if (ptr == NULL)
 			{
 				free(buf);
@@ -22,27 +22,26 @@ char *read_cmd(void)
 		}
 		else if (ptr != NULL)
 		{
-			ptr2 = _realloc(ptr, buflen, ptrlen + buflen);
-			if (ptr2 == NULL)
+			ptr = _realloc(ptr, ptrlen, ptrlen + buflen - 1);
+			if (ptr == NULL)
 			{
-				free(ptr), free(buf);
+				free(buf);
 				return (NULL);
 			}
-			ptr = ptr2;
 		}
-		_strcpy(ptr + ptrlen, buf);
+		_strcpy(ptr, buf, ptrlen);
 		if (buf[buflen - 1] == '\n')
 		{
 			if (buflen == 1 || buf[buflen - 2] != '\\')
 			{
-				free(buf), ptr[buflen] = 00;
+				free(buf), ptr[ptrlen + buflen - 1] = 00;
 				return (ptr);
 			}
-			ptr[ptrlen + buflen - 2] = 00, buflen -= 2, print_prompt2();
+			buflen -= 2, print_prompt2();
 		}
 		ptrlen += buflen;
 	}
-free(ptr2), free(buf);
+free(buf), ptr[ptrlen + buflen - 1] = 00;
 return (ptr);
 }
 
@@ -62,4 +61,22 @@ char *_memcpy(char *dest, char *src, size_t n)
 		dest[x] = src[x];
 	}
 	return (dest);
+}
+
+/**
+ * *_memset - a custome memset function
+ * @s: input string
+ * @b: input character
+ * @n: input integer for length of const application
+ * Return: returns the updated string
+ */
+char *_memset(char *s, char b, unsigned int n)
+{
+	unsigned int i;
+
+	for (i = 0; i < n; i++)
+	{
+		s[i] = b;
+	}
+return (s);
 }

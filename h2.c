@@ -51,13 +51,13 @@ return (x);
  *
  * Return: the copy
  */
-char *_strcpy(char *dest, char *src)
+char *_strcpy(char *dest, char *src, size_t ptrlen)
 {
-int x, y;
-x = _strlen(src);
-for (y = 0; y <= x; y++)
+int y = 0;
+while (src[y] != 00)
 {
-dest[y] = src[y];
+dest[ptrlen] = src[y];
+ptrlen++, y++;
 }
 return (dest);
 }
@@ -71,6 +71,8 @@ return (dest);
 void _puts(char *str)
 {
 int x;
+if (str == NULL)
+return;
 for (x = 0; str[x] != '\0'; x++)
 {
 _putchar(str[x]);
@@ -88,5 +90,7 @@ return;
  */
 int _putchar(char c)
 {
-return (write(1, &c, 1));
+	size_t n = 1;
+
+return (write(STDOUT_FILENO, &c, n));
 }

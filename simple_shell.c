@@ -29,7 +29,10 @@ int main(int argc, char **argv)
 			break;
 		}
 		_puts(cmd);
-		free(cmd);
+		if (cmd)
+		{
+			free(cmd);
+		}
 	}
 exit(1);
 }
