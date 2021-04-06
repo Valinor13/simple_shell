@@ -23,5 +23,6 @@ char *_strcpy(char *dest, char *src, size_t ptrlen);
 size_t get_tkncnt(char *str);
 char *_strdup(char *str);
 void get_exec(char **tknptr);
+char *_strcat(char *dest, char *src);
 
 #endif

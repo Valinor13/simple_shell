@@ -10,7 +10,7 @@ extern char **environ;
  */
 int main(void)
 {
-	char *cmd = NULL, **tknptr = NULL, *cntptr;
+	char *cmd = NULL, **tknptr = NULL, *cntptr, *tmp = NULL;
 	size_t tkncnt, i;
 
 	while (1)
@@ -38,7 +38,11 @@ int main(void)
 		tknptr[0] = strtok(cmd, " ");
 		for (i = 1; i < tkncnt - 1; i++)
 			tknptr[i] = strtok(NULL, " ");
+		tknptr[i] = NULL;
+		tmp = _strcat("/bin/", tknptr[0]);
+		tknptr[0] = tmp;
 		get_exec(tknptr);
+		free(tmp);
 		free(tknptr);
 		free(cmd);
 	}
@@ -47,8 +51,8 @@ exit(1);
 
 void get_exec( char **tknptr)
 {
-	char *env_args[] = {"PATH=/bin", "USER=hshuser", NULL};
-	pid_t pid = fork();
+/*	char *env_args[] = {"PATH=/bin", "USER=hshuser", NULL};
+*/	pid_t pid = fork();
 
 	if (pid != 0)
 	{
@@ -57,7 +61,7 @@ void get_exec( char **tknptr)
 	}
 	if (pid == 0)
 	{
-		if (execve("/bin/ls", tknptr, env_args) == -1)
+		if (execve(tknptr[0], tknptr, NULL) == -1)
 		{
 			perror("exec failure");
 			exit(-1);
@@ -65,4 +69,27 @@ void get_exec( char **tknptr)
 	}
 
 return;
+}
+
+char *_strcat(char *dest, char *src)
+{
+	int i, x, z;
+	char *p = NULL;
+
+	x = _strlen(dest) + _strlen(src);
+
+	p = malloc(sizeof(char) * x + 1);
+	if (p == NULL)
+		exit(-1);
+	for (i = 0; dest[i] != '\0'; i++)
+	{
+		p[i] = dest[i];
+	}
+
+	for (z = 0; i <= x; i++, z++)
+	{
+		p[i] = src[z];
+	}
+
+return (p);
 }
