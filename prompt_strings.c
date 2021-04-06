@@ -6,7 +6,7 @@
  */
 void print_prompt1(void)
 {
-	fprintf(stderr, "$ ");
+	write(STDOUT_FILENO, "$ ", 2);
 }
 
 /**
@@ -15,7 +15,7 @@ void print_prompt1(void)
  */
 void print_prompt2(void)
 {
-	fprintf(stderr, "> ");
+	write(STDOUT_FILENO, "> ", 2);
 }
 
 /**
@@ -24,5 +24,5 @@ void print_prompt2(void)
  */
 void print_prompt3(void)
 {
-	fprintf(stderr, "# ");
+	write(STDOUT_FILENO, "# ", 2);
 }

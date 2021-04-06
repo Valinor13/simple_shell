@@ -13,7 +13,7 @@ char *read_cmd(void)
 		buflen = _strlen(buf);
 		if (ptr == NULL)
 		{
-			ptr = malloc(sizeof(char) * (buflen) + 1);
+			ptr = malloc(sizeof(char) * buflen + 1);
 			if (ptr == NULL)
 			{
 				free(buf);
@@ -22,7 +22,7 @@ char *read_cmd(void)
 		}
 		else if (ptr != NULL)
 		{
-			ptr = _realloc(ptr, ptrlen, ptrlen + buflen - 1);
+			ptr = _realloc(ptr, ptrlen, buflen + ptrlen);
 			if (ptr == NULL)
 			{
 				free(buf);
@@ -30,15 +30,13 @@ char *read_cmd(void)
 			}
 		}
 		_strcpy(ptr, buf, ptrlen);
-		if (buf[buflen - 1] == '\n')
+		if (buflen == 1 || buf[buflen - 2] != '\\')
 		{
-			if (buflen == 1 || buf[buflen - 2] != '\\')
-			{
-				free(buf), ptr[ptrlen + buflen - 1] = 00;
-				return (ptr);
-			}
-			buflen -= 2, print_prompt2();
+			free(buf);
+			ptr[ptrlen + buflen - 1] = 00;
+			return (ptr);
 		}
+		buflen -= 2, ptr[ptrlen + buflen] = 00, print_prompt2();
 		ptrlen += buflen;
 	}
 free(buf), ptr[ptrlen + buflen - 1] = 00;

@@ -6,12 +6,10 @@
  * @argv: arg list
  * Return: returns 1 for success -1 for failure
  */
-int main(int argc, char **argv)
+int main(void)
 {
-	char *cmd;
+	char *cmd, *tknptr;
 
-	(void)argv;
-	(void)argc;
 	while (1)
 	{
 		print_prompt1();
@@ -28,11 +26,14 @@ int main(int argc, char **argv)
 			free(cmd);
 			break;
 		}
-		_puts(cmd);
-		if (cmd)
+		tknptr = strtok(cmd, " ");
+		while (tknptr != NULL)
 		{
-			free(cmd);
+			add_node_end(&thunder_struct, tknptr);
+			tknptr = strtok(NULL, " ");
 		}
+		printf("%s\n", tknptr);
+		free(cmd);
 	}
 exit(1);
 }
