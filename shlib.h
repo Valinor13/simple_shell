@@ -41,5 +41,6 @@ void skip_white_spaces(sauce_t *ptr);
 token_t *tokenize(sauce_t *ptr);
 void free_token(token_t *tkn);
 size_t get_tkncnt(char *str);
+char *_strdup(char *str);
 
 #endif

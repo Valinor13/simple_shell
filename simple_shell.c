@@ -8,16 +8,17 @@
  */
 int main(void)
 {
-	char *cmd, **tknptr, *tmp, *cntptr;
-	size_t  i = 1, tkncnt;
+	char *cmd = NULL, **tknptr = NULL, *cntptr;
+	size_t tkncnt, i;
 
 	while (1)
 	{
+		cntptr = NULL;
 		print_prompt1();
 		cmd = read_cmd();
 		if (cmd == NULL)
 			exit(1);
-		if (cmd[0] == 00 || _strcmp(cmd, "\n") == 0)
+		if (cmd[0] == 00 || cmd[0] == '\n')
 		{
 			free(cmd);
 			continue;
@@ -27,23 +28,18 @@ int main(void)
 			free(cmd);
 			break;
 		}
-		cntptr = cmd;
-		printf("%s\n", cmd);
+		cntptr = _strdup(cmd);
 		tkncnt = get_tkncnt(cntptr);
 		tknptr = malloc(sizeof(char *) * tkncnt);
 		if (tknptr == NULL)
 			exit(1);
-		tmp = strtok(cmd, " ");
-		tknptr[0] = tmp;
-		while (tmp != NULL)
+		tknptr[0] = strtok(cmd, " ");
+		i = 1;
+		while (i < tkncnt - 1)
 		{
-			tmp = strtok(NULL, " ");
-			tknptr[i] = tmp;
-			printf("tknptr: %s\n", tmp);
+			tknptr[i] = strtok(NULL, " ");
 			i++;
 		}
-		for (i = 0; tknptr[i] != NULL; i++)
-			printf("%s ", tknptr[i]);
 		free(tknptr);
 		free(cmd);
 	}
