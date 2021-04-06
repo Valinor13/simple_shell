@@ -53,12 +53,15 @@ return (x);
  */
 char *_strcpy(char *dest, char *src, size_t ptrlen)
 {
-int y = 0;
-while (src[y] != 00)
-{
-dest[ptrlen] = src[y];
-ptrlen++, y++;
-}
+	int y = 0;
+
+	while (src[y] != 00)
+	{
+		if (src[y] == EOF)
+			exit(1);
+		dest[ptrlen] = src[y];
+		ptrlen++, y++;
+	}
 return (dest);
 }
 

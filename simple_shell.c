@@ -1,5 +1,7 @@
 #include "shlib.h"
 
+extern char **environ;
+
 /**
  * main - simple shell
  * @argc: arg count
@@ -18,7 +20,7 @@ int main(void)
 		cmd = read_cmd();
 		if (cmd == NULL)
 			exit(1);
-		if (cmd[0] == 00 || cmd[0] == '\n')
+		if (cmd[0] == '\0')
 		{
 			free(cmd);
 			continue;
@@ -34,14 +36,33 @@ int main(void)
 		if (tknptr == NULL)
 			exit(1);
 		tknptr[0] = strtok(cmd, " ");
-		i = 1;
-		while (i < tkncnt - 1)
-		{
+		for (i = 1; i < tkncnt - 1; i++)
 			tknptr[i] = strtok(NULL, " ");
-			i++;
-		}
+		get_exec(tknptr);
 		free(tknptr);
 		free(cmd);
 	}
 exit(1);
+}
+
+void get_exec( char **tknptr)
+{
+	char *env_args[] = {"PATH=/bin", "USER=hshuser", NULL};
+	pid_t pid = fork();
+
+	if (pid != 0)
+	{
+		while (wait(NULL) != -1)
+			;
+	}
+	if (pid == 0)
+	{
+		if (execve("/bin/ls", tknptr, env_args) == -1)
+		{
+			perror("exec failure");
+			exit(-1);
+		}
+	}
+
+return;
 }
