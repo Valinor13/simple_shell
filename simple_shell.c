@@ -8,7 +8,8 @@
  */
 int main(void)
 {
-	char *cmd, *tknptr;
+	char *cmd, **tknptr, *tmp, *cntptr;
+	size_t  i = 1, tkncnt;
 
 	while (1)
 	{
@@ -26,13 +27,24 @@ int main(void)
 			free(cmd);
 			break;
 		}
-		tknptr = strtok(cmd, " ");
-		while (tknptr != NULL)
+		cntptr = cmd;
+		printf("%s\n", cmd);
+		tkncnt = get_tkncnt(cntptr);
+		tknptr = malloc(sizeof(char *) * tkncnt);
+		if (tknptr == NULL)
+			exit(1);
+		tmp = strtok(cmd, " ");
+		tknptr[0] = tmp;
+		while (tmp != NULL)
 		{
-			add_node_end(&thunder_struct, tknptr);
-			tknptr = strtok(NULL, " ");
+			tmp = strtok(NULL, " ");
+			tknptr[i] = tmp;
+			printf("tknptr: %s\n", tmp);
+			i++;
 		}
-		printf("%s\n", tknptr);
+		for (i = 0; tknptr[i] != NULL; i++)
+			printf("%s ", tknptr[i]);
+		free(tknptr);
 		free(cmd);
 	}
 exit(1);

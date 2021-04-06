@@ -11,7 +11,7 @@ char *_realloc(char *ptr, size_t olen, size_t nlen)
 {
 	char *nptr;
 
-	nptr = malloc(sizeof(nlen));
+	nptr = malloc(nlen);
 	if (nptr == NULL)
 		return (NULL);
 	if (nptr)
@@ -20,4 +20,19 @@ char *_realloc(char *ptr, size_t olen, size_t nlen)
 		free(ptr);
 	}
 	return (nptr);
+}
+
+size_t get_tkncnt(char *str)
+{
+	size_t tkncnt = 1;
+	char *tknptr;
+
+	tknptr = strtok(str, " ");
+	while (tknptr != NULL)
+	{
+		tkncnt++;
+		tknptr = strtok(NULL, " ");
+		printf("tknptr: %s\n", tknptr);
+	}
+return (tkncnt);
 }
