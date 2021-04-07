@@ -7,7 +7,7 @@
 
 ## General usage: The program takes input commands, reads them from the /bin/ and turns them into tokens that then get returned back as arguments. An example is the common argument "ls." The SHELL tokenizes the input, then prints the files in the cuirent directory to standard output.
 
-## Build is in process. Any bugs can be reported to the below contacts and would be appreciated. Your imput will earn you one internet cookie.
+## Build is in process. Any bugs can be reported to the below contacts and would be appreciated. Your input will earn you one internet cookie.
 
 # Credit for creation and contact can be made to the authors at
 >jwcalhoun2@gmail.com
