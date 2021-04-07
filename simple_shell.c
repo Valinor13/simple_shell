@@ -1,23 +1,17 @@
 #include "shlib.h"
 
-extern char **environ;
-
 /**
  * main - simple shell
- * @argc: arg count
- * @argv: arg list
  * Return: returns 1 for success -1 for failure
  */
 int main(void)
 {
-	char *cmd = NULL, **tknptr = NULL, *cntptr, *tmp = NULL;
+	char *cmd = NULL, **tknptr = NULL, *cntptr = NULL, *tmp = NULL;
 	size_t tkncnt, i;
 
 	while (1)
 	{
-		cntptr = NULL;
-		print_prompt1();
-		cmd = read_cmd();
+		print_prompt1(), cmd = read_cmd();
 		if (cmd == NULL)
 			exit(1);
 		if (cmd[0] == '\0')
@@ -30,40 +24,37 @@ int main(void)
 			free(cmd);
 			break;
 		}
-		cntptr = _strdup(cmd);
-		tkncnt = get_tkncnt(cntptr);
+		cntptr = _strdup(cmd), tkncnt = get_tkncnt(cntptr);
 		tknptr = malloc(sizeof(char *) * tkncnt);
 		if (tknptr == NULL)
 			exit(1);
 		tknptr[0] = strtok(cmd, " ");
 		for (i = 1; i < tkncnt - 1; i++)
 			tknptr[i] = strtok(NULL, " ");
-		tknptr[i] = NULL;
-		tmp = _strcat("/bin/", tknptr[0]);
-		tknptr[0] = tmp;
-		get_exec(tknptr);
-		free(tmp);
-		free(tknptr);
+		tknptr[i] = NULL, tmp = _strcat("/bin/", tknptr[0]);
+		tknptr[0] = tmp, get_exec(tknptr), free(tmp), free(tknptr);
 		free(cmd);
 	}
 exit(1);
 }
 
-void get_exec( char **tknptr)
+/**
+ * get_exec - executes a command
+ * @tknptr: input array of strings
+ * Return: returns void
+ */
+void get_exec(char **tknptr)
 {
-/*	char *env_args[] = {"PATH=/bin", "USER=hshuser", NULL};
-*/	pid_t pid = fork();
+	pid_t pid = fork();
 
-	if (pid != 0)
-	{
-		while (wait(NULL) != -1)
-			;
-	}
+	if (pid < 0)
+		perror("forking failure"), exit(-1);
+	wait(NULL);
 	if (pid == 0)
 	{
 		if (execve(tknptr[0], tknptr, NULL) == -1)
 		{
-			perror("exec failure");
+			perror("./hsh");
 			exit(-1);
 		}
 	}
@@ -71,6 +62,12 @@ void get_exec( char **tknptr)
 return;
 }
 
+/**
+ * _strcat - concatenates 2 strings
+ * @dest: first string
+ * @src: second string
+ * Return: returns cat string
+ */
 char *_strcat(char *dest, char *src)
 {
 	int i, x, z;

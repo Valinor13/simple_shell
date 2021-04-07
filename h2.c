@@ -48,7 +48,7 @@ return (x);
  * *_strcpy - copy a string
  * @dest: destination
  * @src: source
- *
+ * @ptrlen: starting posi of ptr cpy
  * Return: the copy
  */
 char *_strcpy(char *dest, char *src, size_t ptrlen)
