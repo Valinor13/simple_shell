@@ -1,4 +1,5 @@
 #include "shlib.h"
+
 /**
  * _realloc - reallocate memory
  * @ptr: input pointer for new malloc
@@ -6,7 +7,6 @@
  * @nlen: the new length required
  * Return: a pointer to new space
  */
-
 char *_realloc(char *ptr, size_t olen, size_t nlen)
 {
 	char *nptr;
@@ -22,6 +22,11 @@ char *_realloc(char *ptr, size_t olen, size_t nlen)
 	return (nptr);
 }
 
+/**
+ * get_tkncnt - gets the count of words in string
+ * @str: input string
+ * Return: returns number of words
+ */
 size_t get_tkncnt(char *str)
 {
 	size_t tkncnt = 1;
