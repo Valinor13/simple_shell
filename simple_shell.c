@@ -7,11 +7,14 @@
 int main(void)
 {
 	char *cmd = NULL, **tknptr = NULL, *cntptr = NULL, *tmp = NULL;
-	size_t tkncnt, i;
+	size_t tkncnt, i, mode;
 
+	mode = isatty(STDIN_FILENO);		
 	while (1)
 	{
-		print_prompt1(), cmd = read_cmd();
+		if (mode)
+			print_prompt1();
+		cmd = read_cmd();
 		if (cmd == NULL)
 			exit(1);
 		if (cmd[0] == '\0')
@@ -19,7 +22,7 @@ int main(void)
 			free(cmd);
 			continue;
 		}
-		if (_strcmp(cmd, "exit\n") == 0)
+		if (_strcmp(cmd, "exit") == 0)
 		{
 			free(cmd);
 			break;
@@ -27,13 +30,24 @@ int main(void)
 		cntptr = _strdup(cmd), tkncnt = get_tkncnt(cntptr);
 		tknptr = malloc(sizeof(char *) * tkncnt);
 		if (tknptr == NULL)
-			exit(1);
+			free(cmd), exit(1);
 		tknptr[0] = strtok(cmd, " ");
 		for (i = 1; i < tkncnt - 1; i++)
 			tknptr[i] = strtok(NULL, " ");
-		tknptr[i] = NULL, tmp = _strcat("/bin/", tknptr[0]);
-		tknptr[0] = tmp, get_exec(tknptr), free(tmp), free(tknptr);
-		free(cmd);
+		tknptr[i] = NULL;
+		if (_strcmp("/bin/", tknptr[0]) == 0)
+			tmp = NULL, get_exec(tknptr, cmd, tmp);
+		else
+		{
+			tmp = _strcat("/bin/", tknptr[0]);
+			tknptr[0] = tmp;
+			get_exec(tknptr, cmd, tmp);
+		}	
+		if (tmp != NULL)
+			free(tmp);
+		free(tknptr), free(cmd);
+		if (mode == 0)
+			break;
 	}
 exit(1);
 }
@@ -43,7 +57,7 @@ exit(1);
  * @tknptr: input array of strings
  * Return: returns void
  */
-void get_exec(char **tknptr)
+void get_exec(char **tknptr, char *cmd, char *tmp)
 {
 	pid_t pid = fork();
 
@@ -54,8 +68,11 @@ void get_exec(char **tknptr)
 	{
 		if (execve(tknptr[0], tknptr, NULL) == -1)
 		{
+			if (tmp != NULL)
+				free(tmp);
+			free(cmd), free(tknptr);
 			perror("./hsh");
-			exit(-1);
+			exit(1);
 		}
 	}
 
@@ -77,7 +94,7 @@ char *_strcat(char *dest, char *src)
 
 	p = malloc(sizeof(char) * x + 1);
 	if (p == NULL)
-		exit(-1);
+		return (NULL);
 	for (i = 0; dest[i] != '\0'; i++)
 	{
 		p[i] = dest[i];
