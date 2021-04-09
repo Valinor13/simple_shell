@@ -9,6 +9,8 @@
 #include <stdarg.h>
 #include <limits.h>
 #include <unistd.h>
+#include <signal.h>
+#include <sys/stat.h>
 
 void print_prompt1(void);
 void print_prompt2(void);
@@ -20,9 +22,12 @@ void _puts(char *str);
 size_t _strlen(char *s);
 char *_realloc(char *ptr, size_t olen, size_t nlen);
 char *_strcpy(char *dest, char *src, size_t ptrlen);
-size_t get_tkncnt(char *str);
+size_t get_tkncnt(char *str, char *delim);
 char *_strdup(char *str);
-void _exec(char **tknptr, char *cmd, char *tmp, char *av[], char *env[]);
 char *_strcat(char *dest, char *src);
+char *get_path(char **pthtok, char **tknptr);
+char *_gwd(char **tmpth);
+void _exec(char **tknptr, char *cmd, char *av[], char *env[]);
+char *_strcpyr(char *dest, char *src, size_t ptrlen);
 
 #endif

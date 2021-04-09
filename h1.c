@@ -6,11 +6,11 @@
 char *read_cmd(void)
 {
 	char *buf = NULL, *ptr = NULL;
-	size_t buflen, bsz = 1024, ptrlen = 0;
+	size_t bsz = 1024, ptrlen = 0;
+	ssize_t buflen;
 
-	while (getline(&buf, &bsz, stdin))
+	while ((buflen = getline(&buf, &bsz, stdin)) != -1)
 	{
-		buflen = _strlen(buf);
 		if (ptr == NULL)
 		{
 			ptr = malloc(sizeof(char) * buflen + 1);
@@ -39,7 +39,7 @@ char *read_cmd(void)
 		buflen -= 2, ptr[ptrlen + buflen] = 00, print_prompt2();
 		ptrlen += buflen;
 	}
-free(buf), ptr[ptrlen + buflen - 1] = 00;
+free(buf);
 return (ptr);
 }
 

@@ -58,8 +58,6 @@ char *_strcpy(char *dest, char *src, size_t ptrlen)
 
 	while (src[y] != 00)
 	{
-		if (src[y] == EOF)
-			exit(1);
 		dest[ptrlen] = src[y];
 		ptrlen++, y++;
 	}
