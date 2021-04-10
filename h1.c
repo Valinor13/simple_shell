@@ -3,7 +3,7 @@
  * read_cmd - takes input and reads to the main file
  * Return:  returns a character string of the command
  */
-char *read_cmd(void)
+char *read_cmd(int *line_cnt)
 {
 	char *buf = NULL, *ptr = NULL;
 	size_t bsz = 1024, ptrlen = 0;
@@ -37,7 +37,7 @@ char *read_cmd(void)
 			return (ptr);
 		}
 		buflen -= 2, ptr[ptrlen + buflen] = 00, print_prompt2();
-		ptrlen += buflen;
+		*line_cnt += 1, ptrlen += buflen;
 	}
 free(buf);
 return (ptr);

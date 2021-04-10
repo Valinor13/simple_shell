@@ -25,6 +25,7 @@ char *_realloc(char *ptr, size_t olen, size_t nlen)
 /**
  * get_tkncnt - gets the count of words in string
  * @str: input string
+ * @delim: token delimitter
  * Return: returns number of words
  */
 size_t get_tkncnt(char *str, char *delim)
@@ -114,13 +115,13 @@ return (p);
  */
 char *_strcpyr(char *dest, char *src, size_t ptrlen)
 {
-        int y = 0;
+	int y = 0;
 
-        while (src[y] != 00)
-        {
-                dest[y] = src[ptrlen];
-                ptrlen++, y++;
-        }
+	while (src[y] != 00)
+	{
+		dest[y] = src[ptrlen];
+		ptrlen++, y++;
+	}
 return (dest);
 }
 

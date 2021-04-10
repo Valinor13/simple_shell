@@ -8,22 +8,26 @@ int main(int ac, char *av[], char *env[])
 {
 	char *cmd = NULL, **tknptr = NULL, *cntptr = NULL;
 	size_t tkncnt, i, mode;
+	int count = 0, *line_cnt = &count;
 
 	(void)ac;
 	mode = isatty(STDIN_FILENO);
 	while (1)
 	{
+		count++;
 		if (mode)
+		{
 			print_prompt1();
-		cmd = read_cmd();
+		}
+		cmd = read_cmd(line_cnt);
 		if (cmd == NULL)
-			exit(1);
+			exit(-1);
 		if (cmd[0] == '\0')
 		{
 			free(cmd);
 			continue;
 		}
-		if (_strcmp(cmd, "exit\0") == 0)
+		if (_strcmp(cmd, "exit") == 0)
 		{
 			free(cmd);
 			break;
@@ -31,12 +35,12 @@ int main(int ac, char *av[], char *env[])
 		cntptr = _strdup(cmd), tkncnt = get_tkncnt(cntptr, " ");
 		tknptr = malloc(sizeof(char *) * tkncnt);
 		if (tknptr == NULL)
-			free(cmd), exit(1);
+			free(cmd), perror("command tokenization failure"), exit(-1);
 		tknptr[0] = strtok(cmd, " ");
 		for (i = 1; i < tkncnt - 1; i++)
 			tknptr[i] = strtok(NULL, " ");
 		tknptr[i] = NULL;
-		_exec(tknptr, cmd, av, env);
+		_exec(tknptr, cmd, av, env, line_cnt);
 		free(tknptr), free(cmd);
 		if (mode == 0)
 			break;
@@ -51,46 +55,47 @@ exit(1);
  * @tmp: input tmp pointer
  * Return: returns void
  */
-void _exec(char **tknptr, char *cmd, char *av[], char *env[])
+void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 {
 	pid_t pid = fork();
 	size_t i, pthcnt, len;
 	char **pthtok, *tmpth = NULL, *npth = NULL;
 
-	for (i = 0; env[i]; i++)
-	{
-		if (_strcmp("PATH=", env[i]) == 0)
-			break;
-	}
-	len = _strlen(env[i]);
-	tmpth = malloc(sizeof(char) * len + 1);
-	tmpth = _strcpyr(tmpth, env[i], 5);
-	tmpth = _gwd(&tmpth);
-	npth = _strdup(tmpth), pthcnt = get_tkncnt(npth, ":");
-	pthtok = malloc(sizeof(char *) * pthcnt);
-	if (pthtok == NULL)
-		free(tmpth), free(cmd), free(tknptr), exit(-1);
-	pthtok[0] = strtok(tmpth, ":");
-	for (i = 1; i < (pthcnt - 1); i++)
-		pthtok[i] = strtok(NULL, ":");
-	pthtok[i] = NULL;
 	if (pid < 0)
 		perror("forking failure"), exit(-1);
 	if (pid == 0)
 	{
 		if (execve(tknptr[0], tknptr, env) == -1)
 		{
-			tknptr[0] = get_path(pthtok, tknptr);
+			for (i = 0; env[i]; i++)
+			{
+				if (_strcmp("PATH=", env[i]) == 0)
+					break;
+			}
+			if (env[i] != NULL)
+			{
+				len = _strlen(env[i]);
+				tmpth = malloc(sizeof(char) * len + 1);
+				tmpth = _strcpyr(tmpth, env[i], 5);
+				tmpth = _gwd(&tmpth);
+				npth = _strdup(tmpth), pthcnt = get_tkncnt(npth, ":");
+				pthtok = malloc(sizeof(char *) * pthcnt);
+				if (pthtok == NULL)
+					perror("path failure"), free(tmpth), free(cmd), free(tknptr), exit(-1);
+				pthtok[0] = strtok(tmpth, ":");
+				for (i = 1; i < (pthcnt - 1); i++)
+					pthtok[i] = strtok(NULL, ":");
+				pthtok[i] = NULL;
+				tknptr[0] = get_path(pthtok, tknptr);
+			}
 			if (execve(tknptr[0], tknptr, env) == -1)
 			{
-				free(tmpth), free(pthtok);
-				free(tknptr), free(cmd);
-				perror(av[0]), exit(1);
+				_pterror(av, tknptr, line_cnt), free(tmpth), free(pthtok);
+				free(tknptr), free(cmd),  exit(1);
 			}
 		}
 	}
 	wait(NULL);
-free(tmpth), free(pthtok);
 return;
 }
 
@@ -112,55 +117,47 @@ char *get_path(char **pthtok, char **tknptr)
 return (tknptr[0]);
 }
 
-char *_gwd(char **tmpth)
+char *_gwd(char **p)
 {
-	size_t i, tlen, clen, nlen, n = 100;
-	char *cwd = NULL, *npth = NULL, *ntmp = NULL;
+	size_t i, x, y, z, xx = 100;
+	char *c = NULL, *n = NULL, *t = NULL;
 
-	ntmp = _strdup(*tmpth);
-	tlen = _strlen(*tmpth);
-	cwd = malloc(n);
-	if (cwd == NULL)
+	t = _strdup(*p), x = _strlen(*p), c = malloc(xx);
+	if (c == NULL)
 	{
 		perror("working directory is NULL");
-		return (*tmpth);
+		exit(-1);
 	}
-	while (getcwd(cwd, n) == NULL)
+	while (getcwd(c, xx) == NULL)
 	{
-		n *= 2, free(cwd), cwd = malloc(n);
-		if (cwd == NULL)
+		xx *= 2, free(c), c = malloc(xx);
+		if (c == NULL)
 		{
 			perror("working directory is NULL");
-			return (*tmpth);
+			exit(-1);
 		}
 	}
-	clen = _strlen(cwd);
-	if (*tmpth[0] == ':')
+	y = _strlen(c);
+	if (*p[0] == ':')
 	{
-		npth = _strcat(cwd, *tmpth);
-		free(cwd), free(*tmpth), free(ntmp);
-		return (npth);
+		n = _strcat(c, *p), free(c), free(*p), free(t);
+		return (n);
 	}
-	for (i = 0; *tmpth[i] == 00; i++)
+	for (i = 0; *p[i] == 00; i++)
 	{
-		if (*tmpth[i] == ':' && *tmpth[i + 1] == ':')
+		if (*p[i] == ':' && *p[i + 1] == ':')
 		{
-			ntmp += (i + 1);
-			*tmpth = _realloc(*tmpth, i, tlen + clen + 1);
-			npth = _strcpy(*tmpth, cwd, (i + 1));
-			nlen = _strlen(npth);
-			npth = _strcpy(npth, ntmp, (nlen + 1));
-			free(ntmp), free(cwd), free(*tmpth);
-			return (npth);
+			t += (i + 1), *p = _realloc(*p, i, x + y + 1), n = _strcpy(*p, c, (i + 1));
+			z = _strlen(n), n = _strcpy(n, t, (z + 1)), free(t), free(c), free(*p);
+			return (n);
 		}
 	}
-	if (*tmpth[tlen] == ':')
+	if (*p[x] == ':')
 	{
-		npth = _strcat(*tmpth, cwd);
-		free(cwd), free(*tmpth), free(ntmp);
-		return (npth);
+		n = _strcat(*p, c), free(c), free(*p), free(t);
+		return (n);
 	}
-free(cwd), free(ntmp);
-return (*tmpth);
+free(c), free(t);
+return (*p);
 }
 
