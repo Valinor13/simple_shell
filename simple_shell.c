@@ -18,11 +18,14 @@ int main(int ac, char *av[], char *env[])
 		count++;
 		if (mode)
 		{
-			print_prompt1();
+			_prompt1();
 		}
-		cmd = read_cmd(line_cnt);
+		cmd = read_line(line_cnt);
 		if (cmd == NULL)
-			exit(0);
+		{
+			if (mode == 0)
+				exit(0);
+		}
 		if (cmd[0] == '\0')
 		{
 			free(cmd);
@@ -42,9 +45,7 @@ int main(int ac, char *av[], char *env[])
 		tknptr[0] = strtok(cmd, " ");
 		for (i = 1; i < tkncnt - 1; i++)
 			tknptr[i] = strtok(NULL, " ");
-		tknptr[i] = NULL;
-		_exec(tknptr, cmd, av, env, line_cnt);
-		free(tknptr), free(cmd);
+		tknptr[i] = NULL, _exec(tknptr, cmd, av, env, line_cnt), free(tknptr), free(cmd);
 		if (mode == 0)
 			break;
 	}
@@ -83,8 +84,6 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 					perror(av[0]), free(cmd), free(tknptr), exit(1);
 				tmpth = _strcpyr(tmpth, env[i], 5);
 				tmpth = _gwd(&tmpth);
-				if (tmpth == NULL)
-					perror(av[0]), exit(1);
 				npth = _strdup(tmpth);
 				if (npth == NULL)
 					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(1);
@@ -97,8 +96,6 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 					pthtok[i] = strtok(NULL, ":");
 				pthtok[i] = NULL;
 				tknptr[0] = get_path(pthtok, tknptr);
-				if (tknptr[0] == NULL)
-					perror(av[0]), exit(1);
 			}
 			if (execve(tknptr[0], tknptr, env) == -1)
 			{
@@ -122,13 +119,15 @@ char *get_path(char **pthtok, char **tknptr)
 	{
 		pthtok[i] = _strcat(pthtok[i], "/");
 		if (pthtok[i] == NULL)
-			return (NULL);
-		tknptr[0] = _strcat(pthtok[i], tknptr[0]), free(pthtok[i]);
+			return (tknptr[0]);
+		tknptr[0] = _strcat(pthtok[i], tknptr[0]);
+		free(pthtok[i]);
 		if (tknptr[0] == NULL)
-			return (NULL);
+			return (tknptr[0]);
 		if (stat(tknptr[0], &statvar) == 0)
 			break;
-		free(tknptr[0]), tknptr[0] = tmp;
+		free(tknptr[0]);
+		tknptr[0] = tmp;
 	}
 return (tknptr[0]);
 }
@@ -143,7 +142,7 @@ char *_gwd(char **pth)
 	{
 		cmac *= 2, free(cwd), cwd = malloc(cmac);
 		if (cwd == NULL)
-			return (NULL);
+			return (*pth);
 	}
 	clen = _strlen(cwd);
 	if (*pth[0] == ':')
