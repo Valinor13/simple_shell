@@ -1,6 +1,7 @@
 #include "shlib.h"
 /**
- * read_cmd - takes input and reads to the main file
+ * read_line - takes input and reads to the main file
+ * @line_cnt: Exactly what it says it is
  * Return:  returns a character string of the command
  */
 char *read_line(int *line_cnt)
@@ -11,6 +12,7 @@ char *read_line(int *line_cnt)
 
 	while ((buflen = getline(&buf, &bsz, stdin)) != -1)
 	{
+	  /*cmd is user input after has checked for slashes, other stuff*/
 		if (cmd == NULL)
 		{
 			cmd = malloc(sizeof(char) * buflen + 1);
@@ -29,6 +31,7 @@ char *read_line(int *line_cnt)
 				return (NULL);
 			}
 		}
+		/*copy dest to source starting at ptrlen*/
 		_strcpy(cmd, buf, ptrlen);
 		if (buflen == 1 || buf[buflen - 2] != '\\')
 		{
