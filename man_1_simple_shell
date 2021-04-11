@@ -1,0 +1,66 @@
+.TH man_1_simple_shell
+.SH NAME
+simple shell - environment used to take input as argument and print to standard out
+.SH SYNOPSIS
+.B behavior is defined by 
+[\fb\-\-ARGUMENT\fr]
+[\fb\-\-FORMAT\fr]
+.SH DESCRIPTION
+.B simple shell -
+ /hsh reads input from user and tokenizes it to pass it as an argument. Each subsequent input after the first is translated as a formatting variable. The tokens are read through the /bin/ in root. The shell then prints the results of all arguments into standard output.
+.SH
+.TP
+.BR cat "- " \fr
+The shell prints a file from start to finish into standard output.
+.SH
+.TP
+.BR echo "- " \fr
+The shell repeats user input into standard output.
+.SH
+.TP
+.BR exit "- " \fr
+The shell terminates.
+.SH
+.TP
+.BR ls "- " \fr
+The shell reports the contents of the current working directory.
+.SH
+.TP
+.BR mv "- " \fr
+The shell renames a file. Usage: "mv womp.c bang.sh" changes a file named "womp.c" into "bang.sh"
+.SH
+.TP
+.BR pwd "- " \fr
+The shell provides the path to the current working directory.
+.SH
+.TP
+.BR touch "-" \fr
+The shell creates an empty file with a specified name.
+.SH EXAMPLES
+To view all files in the current working directory in long format, use
+.BR ls \-la
+.PP
+.nf
+.RS
+input:
+"ls -la"
+output:
+permissions filename .
+permissions filename a.c
+permissions filename b.c
+permissions filename this_man_page
+.RE
+.fi
+.PP
+.SH RETURN
+.TP
+.B Return values are defined by user input and printed to standard output.
+.SH AUTHORS
+.BR \ jwcalhoun2@gmail.com
+.PP
+.BR \ christopher.caswell@rocketmail.com
+.SH COPYRIGHT
+.B Technically, none
+.SH
+.TP
+But don't steal. It's uncool
