@@ -9,20 +9,21 @@
 
 int _strcmp(char *s1, char *s2)
 {
-int y, x;
-for (y = 0; s1[y] != 00; y++)
-{
-if ((s1[y]) == (s2[y]))
-{
-x = 0;
-continue;
-}
-else if (s1[y] != s2[y])
-{
-x = (s1[y] - s2[y]);
-break;
-}
-}
+	int y, x;
+
+	for (y = 0; s1[y] != 00; y++)
+	{
+		if ((s1[y]) == (s2[y]))
+		{
+			x = 0;
+			continue;
+		}
+		else if (s1[y] != s2[y])
+		{
+			x = (s1[y] - s2[y]);
+			break;
+		}
+	}
 return (x);
 }
 
@@ -48,7 +49,7 @@ return (x);
  * *_strcpy - copy a string
  * @dest: destination
  * @src: source
- *
+ * @ptrlen: starting posi of ptr cpy
  * Return: the copy
  */
 char *_strcpy(char *dest, char *src, size_t ptrlen)
@@ -57,8 +58,6 @@ char *_strcpy(char *dest, char *src, size_t ptrlen)
 
 	while (src[y] != 00)
 	{
-		if (src[y] == EOF)
-			exit(1);
 		dest[ptrlen] = src[y];
 		ptrlen++, y++;
 	}

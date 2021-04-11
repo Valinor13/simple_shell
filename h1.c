@@ -3,44 +3,44 @@
  * read_cmd - takes input and reads to the main file
  * Return:  returns a character string of the command
  */
-char *read_cmd(void)
+char *read_line(int *line_cnt)
 {
-	char *buf = NULL, *ptr = NULL;
-	size_t buflen, bsz = 1024, ptrlen = 0;
+	char *buf = NULL, *cmd = NULL;
+	size_t bsz = 1024, ptrlen = 0;
+	ssize_t buflen;
 
-	while (getline(&buf, &bsz, stdin))
+	while ((buflen = getline(&buf, &bsz, stdin)) != -1)
 	{
-		buflen = _strlen(buf);
-		if (ptr == NULL)
+		if (cmd == NULL)
 		{
-			ptr = malloc(sizeof(char) * buflen + 1);
-			if (ptr == NULL)
+			cmd = malloc(sizeof(char) * buflen + 1);
+			if (cmd == NULL)
 			{
 				free(buf);
 				return (NULL);
 			}
 		}
-		else if (ptr != NULL)
+		else if (cmd != NULL)
 		{
-			ptr = _realloc(ptr, ptrlen, buflen + ptrlen);
-			if (ptr == NULL)
+			cmd = _realloc(cmd, ptrlen, buflen + ptrlen);
+			if (cmd == NULL)
 			{
 				free(buf);
 				return (NULL);
 			}
 		}
-		_strcpy(ptr, buf, ptrlen);
+		_strcpy(cmd, buf, ptrlen);
 		if (buflen == 1 || buf[buflen - 2] != '\\')
 		{
 			free(buf);
-			ptr[ptrlen + buflen - 1] = 00;
-			return (ptr);
+			cmd[ptrlen + buflen - 1] = 00;
+			return (cmd);
 		}
-		buflen -= 2, ptr[ptrlen + buflen] = 00, print_prompt2();
-		ptrlen += buflen;
+		buflen -= 2, cmd[ptrlen + buflen] = 00, _prompt2();
+		*line_cnt += 1, ptrlen += buflen;
 	}
-free(buf), ptr[ptrlen + buflen - 1] = 00;
-return (ptr);
+free(buf);
+return (cmd);
 }
 
 /**
