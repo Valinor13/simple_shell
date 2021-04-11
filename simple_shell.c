@@ -30,7 +30,7 @@ int main(int ac, char *av[], char *env[])
 		if (cmd == NULL)
 		{
 			if (mode == 0)
-				exit(0);
+				exit(EXIT_SUCCESS);
 		}
 		if (cmd[0] == '\0')
 		{
@@ -46,11 +46,11 @@ int main(int ac, char *av[], char *env[])
 		cntptr = _strdup(cmd);
 		/*To clarify the contents of cmd before we tokenize it*/
 		if (cntptr == NULL)
-			perror(av[0]), free(cmd), exit(1);
+			perror(av[0]), free(cmd), exit(EXIT_FAILURE);
 		tkncnt = get_tkncnt(cntptr, " "), tknptr = malloc(sizeof(char *) * tkncnt);
 		/*get_tkncnt fills tkncnt with number of words, memory allocated for 2d array*/
 		if (tknptr == NULL)
-			perror(av[0]), free(cmd), exit(1);
+			perror(av[0]), free(cmd), exit(EXIT_FAILURE);
 		tknptr[0] = strtok(cmd, " ");
 		/*tknptr is fed a series of strings, treating them as entries in an array*/
 		for (i = 1; i < tkncnt - 1; i++)
@@ -60,7 +60,7 @@ int main(int ac, char *av[], char *env[])
 		if (mode == 0)
 			break;
 	}
-exit(errno);
+exit(EXIT_SUCCESS);
 }
 
 /**
@@ -79,7 +79,7 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 	char **pthtok, *tmpth = NULL, *npth = NULL;
 
 	if (pid < 0)
-		perror(av[0]), exit(1);
+		perror(av[0]), exit(EXIT_FAILURE);
 	if (pid == 0)
 	{
 	  /*if execve fails to execute tknptr in the path*/
@@ -99,7 +99,7 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 				if (tmpth == NULL)
 				  /*tmpth = temporary path*/
 				    /*perror prints num of sys call associated w/ fail*/
-					perror(av[0]), free(cmd), free(tknptr), exit(1);
+					perror(av[0]), free(cmd), free(tknptr), exit(EXIT_FAILURE);
 				/*copies "PATH=..." into beginning of string at array point 5*/
 				tmpth = _strcpyr(tmpth, env[i], 5);
 				/*Adds the current working directory to the path, if necessary*/
@@ -107,11 +107,11 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 				/*npth = new path*/
 				npth = _strdup(tmpth);
 				if (npth == NULL)
-					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(1);
+					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
 				pthcnt = get_tkncnt(npth, ":");
 				pthtok = malloc(sizeof(char *) * pthcnt);
 				if (pthtok == NULL)
-					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(1);
+					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
 				pthtok[0] = strtok(tmpth, ":");
 				for (i = 1; i < (pthcnt - 1); i++)
 /*strtok convert delimiter arg into first arg, tokenizing tknptr, end when finds 00*/
@@ -123,7 +123,7 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 			if (execve(tknptr[0], tknptr, env) == -1)
 			{
 				_pterror(av, tknptr, line_cnt), free(tmpth), free(pthtok);
-				free(tknptr), free(cmd),  exit(1);
+				free(tknptr), free(cmd),  exit(EXIT_FAILURE);
 			}
 		}
 	}
