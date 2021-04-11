@@ -15,9 +15,10 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-void print_prompt1(void);
-void print_prompt2(void);
-char *read_cmd(int *line_cnt);
+void _prompt1(void);
+void _prompt2(void);
+void _prompt3(void);
+char *read_line(int *line_cnt);
 int _putchar(char c);
 char *_memcpy(char *dest, char *src, size_t n);
 int _strcmp(char *s1, char *s2);

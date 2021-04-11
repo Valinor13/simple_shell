@@ -4,7 +4,7 @@
  * print_prompt1 - prints $
  * Return: returns void
  */
-void print_prompt1(void)
+void _prompt1(void)
 {
 	write(STDOUT_FILENO, "$ ", 2);
 }
@@ -13,7 +13,7 @@ void print_prompt1(void)
  * print_prompt2 - prints >
  * Return: returns void
  */
-void print_prompt2(void)
+void _prompt2(void)
 {
 	write(STDOUT_FILENO, "> ", 2);
 }
@@ -22,7 +22,7 @@ void print_prompt2(void)
  * print_prompt3 - prints #
  * Return: returns void
  */
-void print_prompt3(void)
+void _prompt3(void)
 {
 	write(STDOUT_FILENO, "# ", 2);
 }
@@ -43,7 +43,7 @@ void _pterror(char **av, char **tknptr, int *line_cnt)
 	tmp = _strcat(tmp2, ": not found\n");
 	free(tmp2);
 	i = _strlen(tmp);
-	write(2, tmp, i);
+	write(STDERR_FILENO, tmp, i);
 	free(tmp);
 return;
 }
