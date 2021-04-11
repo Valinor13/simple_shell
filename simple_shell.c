@@ -11,6 +11,7 @@ int main(int ac, char *av[], char *env[])
 	int count = 0, *line_cnt = &count;
 
 	(void)ac;
+	signal(SIGINT, SIG_IGN);
 	mode = isatty(STDIN_FILENO);
 	while (1)
 	{
@@ -21,7 +22,7 @@ int main(int ac, char *av[], char *env[])
 		}
 		cmd = read_cmd(line_cnt);
 		if (cmd == NULL)
-			exit(-1);
+			exit(0);
 		if (cmd[0] == '\0')
 		{
 			free(cmd);
@@ -32,10 +33,12 @@ int main(int ac, char *av[], char *env[])
 			free(cmd);
 			break;
 		}
-		cntptr = _strdup(cmd), tkncnt = get_tkncnt(cntptr, " ");
-		tknptr = malloc(sizeof(char *) * tkncnt);
+		cntptr = _strdup(cmd);
+		if (cntptr == NULL)
+			perror(av[0]), free(cmd), exit(1);
+		tkncnt = get_tkncnt(cntptr, " "), tknptr = malloc(sizeof(char *) * tkncnt);
 		if (tknptr == NULL)
-			free(cmd), perror("command tokenization failure"), exit(-1);
+			perror(av[0]), free(cmd), exit(1);
 		tknptr[0] = strtok(cmd, " ");
 		for (i = 1; i < tkncnt - 1; i++)
 			tknptr[i] = strtok(NULL, " ");
@@ -45,7 +48,7 @@ int main(int ac, char *av[], char *env[])
 		if (mode == 0)
 			break;
 	}
-exit(1);
+exit(errno);
 }
 
 /**
@@ -62,7 +65,7 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 	char **pthtok, *tmpth = NULL, *npth = NULL;
 
 	if (pid < 0)
-		perror("forking failure"), exit(-1);
+		perror(av[0]), exit(1);
 	if (pid == 0)
 	{
 		if (execve(tknptr[0], tknptr, env) == -1)
@@ -76,17 +79,26 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 			{
 				len = _strlen(env[i]);
 				tmpth = malloc(sizeof(char) * len + 1);
+				if (tmpth == NULL)
+					perror(av[0]), free(cmd), free(tknptr), exit(1);
 				tmpth = _strcpyr(tmpth, env[i], 5);
 				tmpth = _gwd(&tmpth);
-				npth = _strdup(tmpth), pthcnt = get_tkncnt(npth, ":");
+				if (tmpth == NULL)
+					perror(av[0]), exit(1);
+				npth = _strdup(tmpth);
+				if (npth == NULL)
+					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(1);
+				pthcnt = get_tkncnt(npth, ":");
 				pthtok = malloc(sizeof(char *) * pthcnt);
 				if (pthtok == NULL)
-					perror("path failure"), free(tmpth), free(cmd), free(tknptr), exit(-1);
+					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(1);
 				pthtok[0] = strtok(tmpth, ":");
 				for (i = 1; i < (pthcnt - 1); i++)
 					pthtok[i] = strtok(NULL, ":");
 				pthtok[i] = NULL;
 				tknptr[0] = get_path(pthtok, tknptr);
+				if (tknptr[0] == NULL)
+					perror(av[0]), exit(1);
 			}
 			if (execve(tknptr[0], tknptr, env) == -1)
 			{
@@ -109,7 +121,11 @@ char *get_path(char **pthtok, char **tknptr)
 	for (i = 0; pthtok[i] != NULL; i++)
 	{
 		pthtok[i] = _strcat(pthtok[i], "/");
+		if (pthtok[i] == NULL)
+			return (NULL);
 		tknptr[0] = _strcat(pthtok[i], tknptr[0]), free(pthtok[i]);
+		if (tknptr[0] == NULL)
+			return (NULL);
 		if (stat(tknptr[0], &statvar) == 0)
 			break;
 		free(tknptr[0]), tknptr[0] = tmp;
@@ -117,47 +133,40 @@ char *get_path(char **pthtok, char **tknptr)
 return (tknptr[0]);
 }
 
-char *_gwd(char **p)
+char *_gwd(char **pth)
 {
-	size_t i, x, y, z, xx = 100;
-	char *c = NULL, *n = NULL, *t = NULL;
+	size_t i, plen, clen, nlen, cmac = 100;
+	char *cwd = NULL, *npth = NULL, *tpth = NULL;
 
-	t = _strdup(*p), x = _strlen(*p), c = malloc(xx);
-	if (c == NULL)
+	tpth = _strdup(*pth), plen = _strlen(*pth), cwd = malloc(cmac);
+	while (getcwd(cwd, cmac) == NULL)
 	{
-		perror("working directory is NULL");
-		exit(-1);
+		cmac *= 2, free(cwd), cwd = malloc(cmac);
+		if (cwd == NULL)
+			return (NULL);
 	}
-	while (getcwd(c, xx) == NULL)
+	clen = _strlen(cwd);
+	if (*pth[0] == ':')
 	{
-		xx *= 2, free(c), c = malloc(xx);
-		if (c == NULL)
+		npth = _strcat(cwd, *pth), free(cwd), free(*pth), free(tpth);
+		return (npth);
+	}
+	for (i = 0; *pth[i] == 00; i++)
+	{
+		if (*pth[i] == ':' && *pth[i + 1] == ':')
 		{
-			perror("working directory is NULL");
-			exit(-1);
+			tpth += (i + 1), *pth = _realloc(*pth, i, plen + clen + 1);
+			*pth = _strcpy(*pth, cwd, (i + 1)), nlen = _strlen(*pth);
+			*pth = _strcpy(*pth, tpth, (nlen + 1)), free(tpth), free(cwd);
+			return (*pth);
 		}
 	}
-	y = _strlen(c);
-	if (*p[0] == ':')
+	if (*pth[plen] == ':')
 	{
-		n = _strcat(c, *p), free(c), free(*p), free(t);
-		return (n);
+		npth = _strcat(*pth, cwd), free(cwd), free(*pth), free(tpth);
+		return (npth);
 	}
-	for (i = 0; *p[i] == 00; i++)
-	{
-		if (*p[i] == ':' && *p[i + 1] == ':')
-		{
-			t += (i + 1), *p = _realloc(*p, i, x + y + 1), n = _strcpy(*p, c, (i + 1));
-			z = _strlen(n), n = _strcpy(n, t, (z + 1)), free(t), free(c), free(*p);
-			return (n);
-		}
-	}
-	if (*p[x] == ':')
-	{
-		n = _strcat(*p, c), free(c), free(*p), free(t);
-		return (n);
-	}
-free(c), free(t);
-return (*p);
+free(cwd), free(tpth);
+return (*pth);
 }
 

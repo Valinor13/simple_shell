@@ -43,7 +43,7 @@ void _pterror(char **av, char **tknptr, int *line_cnt)
 	tmp = _strcat(tmp2, ": not found\n");
 	free(tmp2);
 	i = _strlen(tmp);
-	write(2, tmp, i);
+	write(STDERR_FILENO, tmp, i);
 	free(tmp);
 return;
 }
