@@ -82,3 +82,21 @@ char *_memset(char *s, char b, unsigned int n)
 return (s);
 }
 
+/**
+ * _charcmp - compares characters looking for slash
+ * @tknptr: tknptr 0 looking for slash
+ * @slash: /
+ * Return: returns size_t 0 for success 1 for failure
+ */
+size_t _charcmp(char *tknptr, char slash)
+{
+	int i = 0;
+
+	while (tknptr[i])
+	{
+		if (tknptr[i] == slash)
+			return (0);
+		i++;
+	}
+return (1);
+}
