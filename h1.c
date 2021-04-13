@@ -100,3 +100,36 @@ size_t _charcmp(char *tknptr, char slash)
 	}
 return (1);
 }
+
+/**
+ * get_path - turns input of tkn path into string
+ * @pthtok: tokenized 2d array of the path
+ * @tknptr: tokenized array of the user's input
+ * Return: new tknptr, with stat checked functionality
+ */
+char *get_path(char **pthtok, char **tknptr)
+{
+  struct stat statvar;
+  int i;
+  char *tmp = NULL;
+
+  tmp = tknptr[0];
+  for (i = 0; pthtok[i] != NULL; i++)
+    {
+      pthtok[i] = _strcat(pthtok[i], "/");
+      /*appends tkn input w/ '/' to run stat*/
+      if (pthtok[i] == NULL)
+	return (tknptr[0]);
+      tknptr[0] = _strcat(pthtok[i], tknptr[0]);
+      /*Read with '/', append new string with user command*/
+      free(pthtok[i]);
+      if (tknptr[0] == NULL)
+	return (tknptr[0]);
+      if (stat(tknptr[0], &statvar) == 0)
+	break;
+      /*stat(0) == success, we break. If it fails, we try again*/
+      free(tknptr[0]);
+      tknptr[0] = tmp;
+    }
+  return (tknptr[0]);
+}

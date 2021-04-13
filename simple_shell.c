@@ -8,7 +8,7 @@
 void handler(int num)
 {
 (void)num;
-write(STDOUT_FILENO, "\n$ ". 3);
+ write(STDOUT_FILENO, "\n$ ", 3);
 }
 
 /**
@@ -20,9 +20,9 @@ write(STDOUT_FILENO, "\n$ ". 3);
  */
 int main(int ac, char *av[], char *env[])
 {
-	char *cmd = NULL, **tknptr = NULL, *cntptr = NULL;
-	size_t tkncnt, i, mode;
-	int count = 0, *line_cnt = &count;
+  char *cmd = NULL, **tknptr = NULL;
+	size_t mode;
+	int count = 0, *line_cnt = &count, exit_status = 0;
 
 	(void)ac;
 	signal(SIGINT, handler);
@@ -41,40 +41,38 @@ int main(int ac, char *av[], char *env[])
 		{
 			if (mode)
 				write(STDOUT_FILENO, "\n", 1);
-			exit(0);
+			break;
+			/*exit(exit_status);*/
 		}
 		if (cmd[0] == '\0')
 		{
 			free(cmd);
 			continue;
 		}
-/*		if (_strcmp(cmd, "exit") == 0)
-		{
-			free(cmd);
-			break;
-		}
-*/		cntptr = _strdup(cmd);
-		/*To clarify the contents of cmd before we tokenize it*/
+		tknptr = _tokenize(cmd, av);
+/*		cntptr = _strdup(cmd);
+
 		if (cntptr == NULL)
 			perror(av[0]), free(cmd), exit(EXIT_FAILURE);
 		tkncnt = get_tkncnt(cntptr, " "), tknptr = malloc(sizeof(char *) * tkncnt);
-		/*get_tkncnt fills tkncnt with number of words, memory allocated for 2d array*/
+
 		if (tknptr == NULL)
 			perror(av[0]), free(cmd), exit(EXIT_FAILURE);
 		tknptr[0] = strtok(cmd, " ");
-		/*tknptr is fed a series of strings, treating them as entries in an array*/
+
 		for (i = 1; i < tkncnt - 1; i++)
-		  /*strtok converts the delimiter arg into first arg, tokenizing tknptr, ending in NULL*/
+
 			tknptr[i] = strtok(NULL, " ");
-		if (_strcmp(tknptr[0], "exit") == 0)
+*/		if (_strcmp(tknptr[0], "exit") == 0)
 		{
-			/*strcmp success on 0*/
+
 			free(cmd), free(tknptr);
 			break;
 		}
-		tknptr[i] = NULL, _exec(tknptr, cmd, av, env, line_cnt), free(tknptr), free(cmd);
+
+		exit_status = _exec(tknptr, cmd, av, env, line_cnt, exit_status), free(tknptr), free(cmd);
 	}
-exit(EXIT_SUCCESS);
+	exit(exit_status);
 }
 
 /**
@@ -86,9 +84,10 @@ exit(EXIT_SUCCESS);
  * @line_cnt: Exactly what it says
  * Return: returns void
  */
-void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
+int _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt, int exit_status)
 {
 	pid_t pid = fork();
+	int status;
 
 	if (pid < 0)
 		perror(av[0]), exit(EXIT_FAILURE);
@@ -103,40 +102,16 @@ void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 	}
 	/*Child path will either always find the path or not*/
 	/*Parent process will wait until child is NULL value, then return*/
-	wait(NULL);
-return;
-}
-/**
- * get_path - turns input of tkn path into string
- * @pthtok: tokenized 2d array of the path
- * @tknptr: tokenized array of the user's input
- * Return: new tknptr, with stat checked functionality
- */
-char *get_path(char **pthtok, char **tknptr)
-{
-	struct stat statvar;
-	int i;
-	char *tmp = NULL;
-
-	tmp = tknptr[0];
-	for (i = 0; pthtok[i] != NULL; i++)
-	{
-		pthtok[i] = _strcat(pthtok[i], "/");
-		/*appends tkn input w/ '/' to run stat*/
-		if (pthtok[i] == NULL)
-			return (tknptr[0]);
-		tknptr[0] = _strcat(pthtok[i], tknptr[0]);
-		/*Read with '/', append new string with user command*/
-		free(pthtok[i]);
-		if (tknptr[0] == NULL)
-			return (tknptr[0]);
-		if (stat(tknptr[0], &statvar) == 0)
-			break;
-		/*stat(0) == success, we break. If it fails, we try again*/
-		free(tknptr[0]);
-		tknptr[0] = tmp;
-	}
-return (tknptr[0]);
+	waitpid(pid, &status, 0);
+	if (WIFEXITED(status))
+	  {
+	  exit_status = WEXITSTATUS(status);
+	  if (exit_status == 1)
+	    exit_status = 127;
+	  }
+	else 
+	exit_status = 0;
+	return (exit_status);
 }
 
 /**
@@ -237,3 +212,31 @@ char *get_tknptr(char *env[], char *av[], char *tknptr[], char *cmd)
 	return (tknptr[0]);
 }
 
+/**
+ * _tokenize - space saver
+ * @cmd: uh huh
+ * Return: tokenized string
+ */
+char **_tokenize(char *cmd, char *av[])
+{
+size_t tkncnt, i;
+char *cntptr = NULL, **tknptr = NULL;
+
+cntptr = _strdup(cmd);
+
+if (cntptr == NULL)
+perror(av[0]), free(cmd), exit(EXIT_FAILURE);
+tkncnt = get_tkncnt(cntptr, " "), tknptr = malloc(sizeof(char *) * tkncnt);
+
+if (tknptr == NULL)
+perror(av[0]), free(cmd), exit(EXIT_FAILURE);
+
+tknptr[0] = strtok(cmd, " ");
+
+for (i = 1; i < tkncnt - 1; i++)
+tknptr[i] = strtok(NULL, " ");
+
+tknptr[i] = NULL; 
+
+ return(tknptr);
+}
