@@ -1,6 +1,17 @@
 #include "shlib.h"
 
 /**
+ * handler - Takes user input for ctrl+c
+ * @num: voided
+ * Return: the correct intended response to CTRL+C 
+ */
+void handler(int num)
+{
+(void)num;
+write(STDOUT_FILENO, "\n$ ". 3);
+}
+
+/**
  * main - simple shell
  * @ac: voided, but necessary argument
  * @av: argument vectors
@@ -14,8 +25,7 @@ int main(int ac, char *av[], char *env[])
 	int count = 0, *line_cnt = &count;
 
 	(void)ac;
-	signal(SIGINT, SIG_IGN);
-	/*SIGINT = Ctrl+C, telling f(x) to ignore input thereof*/
+	signal(SIGINT, handler);
 	mode = isatty(STDIN_FILENO);
 	/*isatty answers if input is waiting, terminal up*/
 	while (1)

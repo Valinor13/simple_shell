@@ -37,5 +37,6 @@ void _pterror(char **av, char **tknptr, int *line_cnt);
 char *printint(int *line_cnt);
 size_t _charcmp(char *tknptr, char slash);
 char *get_tknptr(char *env[], char *av[], char *tknptr[], char *cmd);
+void handler(int num);
 
 #endif
