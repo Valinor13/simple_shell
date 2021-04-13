@@ -29,21 +29,21 @@ int main(int ac, char *av[], char *env[])
 		/*effectively getline, including line count*/
 		if (cmd == NULL)
 		{
-			if (mode == 0)
-				exit(EXIT_SUCCESS);
+			if (mode)
+				write(STDOUT_FILENO, "\n", 1);
+			exit(0);
 		}
 		if (cmd[0] == '\0')
 		{
 			free(cmd);
 			continue;
 		}
-		if (_strcmp(cmd, "exit") == 0)
-		  /*strcmp success on 0*/
+/*		if (_strcmp(cmd, "exit") == 0)
 		{
 			free(cmd);
 			break;
 		}
-		cntptr = _strdup(cmd);
+*/		cntptr = _strdup(cmd);
 		/*To clarify the contents of cmd before we tokenize it*/
 		if (cntptr == NULL)
 			perror(av[0]), free(cmd), exit(EXIT_FAILURE);
@@ -56,9 +56,13 @@ int main(int ac, char *av[], char *env[])
 		for (i = 1; i < tkncnt - 1; i++)
 		  /*strtok converts the delimiter arg into first arg, tokenizing tknptr, ending in NULL*/
 			tknptr[i] = strtok(NULL, " ");
-		tknptr[i] = NULL, _exec(tknptr, cmd, av, env, line_cnt), free(tknptr), free(cmd);
-		if (mode == 0)
+		if (_strcmp(tknptr[0], "exit") == 0)
+		{
+			/*strcmp success on 0*/
+			free(cmd), free(tknptr);
 			break;
+		}
+		tknptr[i] = NULL, _exec(tknptr, cmd, av, env, line_cnt), free(tknptr), free(cmd);
 	}
 exit(EXIT_SUCCESS);
 }
@@ -75,56 +79,16 @@ exit(EXIT_SUCCESS);
 void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt)
 {
 	pid_t pid = fork();
-	size_t i, pthcnt, len;
-	char **pthtok, *tmpth = NULL, *npth = NULL;
 
 	if (pid < 0)
 		perror(av[0]), exit(EXIT_FAILURE);
 	if (pid == 0)
 	{
-	  /*if execve fails to execute tknptr in the path*/
+		tknptr[0] = get_tknptr(env, av, tknptr, cmd);
 		if (execve(tknptr[0], tknptr, env) == -1)
 		{
-			for (i = 0; env[i]; i++)
-			{
-			  /*When the function succesfully finds  PATH= in the env*/
-				if (_strcmp("PATH=", env[i]) == 0)
-					break;
-			}
-			if (env[i] != NULL)
-			{
-			  /*if we find PATH:*/
-				len = _strlen(env[i]);
-				tmpth = malloc(sizeof(char) * len - 4);
-				if (tmpth == NULL)
-				  /*tmpth = temporary path*/
-				    /*perror prints num of sys call associated w/ fail*/
-					perror(av[0]), free(cmd), free(tknptr), exit(EXIT_FAILURE);
-				/*copies "PATH=..." into beginning of string at array point 5*/
-				tmpth = _strcpyr(tmpth, env[i], 5);
-				/*Adds the current working directory to the path, if necessary*/
-				tmpth = _gwd(&tmpth);
-				/*npth = new path*/
-				npth = _strdup(tmpth);
-				if (npth == NULL)
-					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
-				pthcnt = get_tkncnt(npth, ":");
-				pthtok = malloc(sizeof(char *) * pthcnt);
-				if (pthtok == NULL)
-					perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
-				pthtok[0] = strtok(tmpth, ":");
-				for (i = 1; i < (pthcnt - 1); i++)
-/*strtok convert delimiter arg into first arg, tokenizing tknptr, end when finds 00*/
-					pthtok[i] = strtok(NULL, ":");
-				/*Append a NULL pointer to end of tokens*/
-				pthtok[i] = NULL;
-				tknptr[0] = get_path(pthtok, tknptr);
-			}
-			if (execve(tknptr[0], tknptr, env) == -1)
-			{
-				_pterror(av, tknptr, line_cnt), free(tmpth), free(pthtok);
-				free(tknptr), free(cmd),  exit(EXIT_FAILURE);
-			}
+			_pterror(av, tknptr, line_cnt);
+			free(tknptr), free(cmd),  exit(EXIT_FAILURE);
 		}
 	}
 	/*Child path will either always find the path or not*/
@@ -142,7 +106,7 @@ char *get_path(char **pthtok, char **tknptr)
 {
 	struct stat statvar;
 	int i;
-	char *tmp;
+	char *tmp = NULL;
 
 	tmp = tknptr[0];
 	for (i = 0; pthtok[i] != NULL; i++)
@@ -164,50 +128,102 @@ char *get_path(char **pthtok, char **tknptr)
 	}
 return (tknptr[0]);
 }
+
 /**
  * _gwd - Appends working directory to the path if necessary
  * @pth: the PATH
  * Return: a pointer to the PATH
  */
-char *_gwd(char **pth)
+char *_gwd(char *pth)
 {
-	size_t i, plen, clen, nlen, cmac = 100;
+	size_t i, plen, clen, cmac = 100;
 	char *cwd = NULL, *npth = NULL, *tpth = NULL;
 
-	tpth = _strdup(*pth), plen = _strlen(*pth), cwd = malloc(cmac);
+	plen = _strlen(pth), cwd = malloc(cmac);
 	while (getcwd(cwd, cmac) == NULL)
 	{
 	  /*If not enough memory has been allocated, double and try again*/
 		cmac *= 2, free(cwd), cwd = malloc(cmac);
 		/*If not enough space is allocated or the cwd is NULL*/
 		if (cwd == NULL)
-			return (*pth);
+			return (pth);
 	}
 	clen = _strlen(cwd);
-	if (*pth[0] == ':')
+	if (pth[0] == ':')
 	{
-		npth = _strcat(cwd, *pth), free(cwd), free(*pth), free(tpth);
+		npth = _strcat(cwd, pth), free(cwd), free(pth);
 		return (npth);
 	}
-	for (i = 0; *pth[i] == 00; i++)
+	for (i = 0; pth[i] != 00; i++)
 	{
-		if (*pth[i] == ':' && *pth[i + 1] == ':')
+		if (pth[i] == ':' && pth[i + 1] == ':')
 		{
+			tpth = malloc(plen - i);
+			if (tpth == NULL)
+				return (pth);
 		  /*_realloc prints *pth up to point i, then cwd, then path @i +1*/
 		  /*in between the ::*/
-			tpth += (i + 1), *pth = _realloc(*pth, i, plen + clen + 1);
-			*pth = _strcpy(*pth, cwd, (i + 1)), nlen = _strlen(*pth);
-			*pth = _strcpy(*pth, tpth, (nlen + 1)), free(tpth), free(cwd);
-			return (*pth);
+			tpth = _strcpyr(tpth, pth, i + 1), npth = _realloc(pth, i + 1, plen + clen + 1);
+			npth = _strcpy(npth, cwd, (i + 1)), npth = _strcpy(npth, tpth, (i + clen + 1));
+			npth[plen + clen] = 00, free(tpth), free(cwd);
+			return (npth);
 		}
 	}
-	if (*pth[plen] == ':')
+	if (pth[plen - 1] == ':')
 	{
 	  /*If : is at the end, we place the cwd at the end*/
-		npth = _strcat(*pth, cwd), free(cwd), free(*pth), free(tpth);
+		npth = _strcat(pth, cwd), free(cwd), free(pth), free(tpth);
 		return (npth);
 	}
 free(cwd), free(tpth);
-return (*pth);
+return (pth);
+}
+
+/**
+ * get_tknptr - gets the tknptr with path for execution
+ * @env: environment path string
+ * Return: returns tknptr with path or exits with failure
+ */
+char *get_tknptr(char *env[], char *av[], char *tknptr[], char *cmd)
+{
+	size_t i, pthcnt, len;
+	char **pthtok = NULL, *tmpth = NULL, *npth = NULL;
+
+		for (i = 0; env[i]; i++)
+		{
+		/*When the function succesfully finds  PATH= in the env*/
+			if (_strcmp("PATH=", env[i]) == 0)
+				break;
+		}
+		if (env[i] != NULL && _charcmp(tknptr[0], '/') != 0)
+		{
+			/*if we find PATH:*/
+			len = _strlen(env[i]);
+			tmpth = malloc(sizeof(char) * len - 4);
+			if (tmpth == NULL)
+			/*tmpth = temporary path*/
+			/*perror prints num of sys call associated w/ fail*/
+				perror(av[0]), free(cmd), free(tknptr), exit(EXIT_FAILURE);
+			/*copies "PATH=..." into beginning of string at array point 5*/
+			tmpth = _strcpyr(tmpth, env[i], 5);
+			/*Adds the current working directory to the path, if necessary*/
+			tmpth = _gwd(tmpth);
+			/*npth = new path*/
+			npth = _strdup(tmpth);
+			if (npth == NULL)
+				perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
+			pthcnt = get_tkncnt(npth, ":");
+			pthtok = malloc(sizeof(char *) * pthcnt);
+			if (pthtok == NULL)
+				perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
+			pthtok[0] = strtok(tmpth, ":");
+			for (i = 1; i < (pthcnt - 1); i++)
+			/*strtok convert delimiter arg into first arg, tokenizes tknptr, end when finds 00*/
+				pthtok[i] = strtok(NULL, ":");
+			/*Append a NULL pointer to end of tokens*/
+			pthtok[i] = NULL, tknptr[0] = get_path(pthtok, tknptr);
+			free(tmpth), free(pthtok);
+		}
+	return (tknptr[0]);
 }
 

@@ -30,10 +30,12 @@ size_t get_tkncnt(char *str, char *delim);
 char *_strdup(char *str);
 char *_strcat(char *dest, char *src);
 char *get_path(char **pthtok, char **tknptr);
-char *_gwd(char **tmpth);
+char *_gwd(char *tmpth);
 void _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt);
 char *_strcpyr(char *dest, char *src, size_t ptrlen);
 void _pterror(char **av, char **tknptr, int *line_cnt);
 char *printint(int *line_cnt);
+size_t _charcmp(char *tknptr, char slash);
+char *get_tknptr(char *env[], char *av[], char *tknptr[], char *cmd);
 
 #endif

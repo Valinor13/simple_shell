@@ -9,7 +9,7 @@
  */
 char *_realloc(char *ptr, size_t olen, size_t nlen)
 {
-	char *nptr;
+	char *nptr = NULL;
 
 	nptr = malloc(nlen);
 	if (nptr == NULL)
@@ -31,7 +31,7 @@ char *_realloc(char *ptr, size_t olen, size_t nlen)
 size_t get_tkncnt(char *str, char *delim)
 {
 	size_t tkncnt = 1;
-	char *tknptr;
+	char *tknptr = NULL;
 
 	tknptr = strtok(str, delim);
 	while (tknptr != NULL)
@@ -50,7 +50,7 @@ return (tkncnt);
  */
 char *_strdup(char *str)
 {
-	char *s;
+	char *s = NULL;
 	int i, x;
 
 	if (str == NULL)
@@ -117,11 +117,12 @@ char *_strcpyr(char *dest, char *src, size_t ptrlen)
 {
 	int y = 0;
 
-	while (src[y] != 00)
+	while (src[ptrlen] != 00)
 	{
 		dest[y] = src[ptrlen];
 		ptrlen++, y++;
 	}
+	dest[y] = 00;
 return (dest);
 }
 
