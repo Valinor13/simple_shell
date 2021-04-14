@@ -4,47 +4,20 @@
  * @ln_cnt: Exactly what it says it is
  * Return:  returns a character string of the command
  */
-char *read_line(int *ln_cnt)
+char *read_line(void)
 {
-	char *buf = NULL, *cmd = NULL;
-	size_t bsz = 1024, ptrlen = 0;
+	char *buf = NULL;
+	size_t bsz = 0;
 	ssize_t buflen;
 
 	while ((buflen = getline(&buf, &bsz, stdin)) != -1)
 	{
-	  /*cmd is user input after has checked for slashes, other stuff*/
-		if (cmd == NULL)
-		{
-			cmd = malloc(sizeof(char) * buflen + 1);
-			if (cmd == NULL)
-			{
-				free(buf);
-				return (NULL);
-			}
-		}
-		else if (cmd != NULL)
-		{
-			cmd = _realloc(cmd, ptrlen, buflen + ptrlen);
-			if (cmd == NULL)
-			{
-				free(buf);
-				return (NULL);
-			}
-		}
-		/*copy dest to source starting at ptrlen*/
-		_strcpy(cmd, buf, ptrlen);
-		if (buflen == 1 || buf[buflen - 2] != '\\')
-		{
-			free(buf);
-			if (cmd[ptrlen + buflen - 1] == '\n')
-				cmd[ptrlen + buflen - 1] = 00;
-			return (cmd);
-		}
-		buflen -= 2, cmd[ptrlen + buflen] = 00, _prompt2();
-		*ln_cnt += 1, ptrlen += buflen;
+		if (buf[buflen - 1] == '\n')
+			buf[buflen - 1] = 00;
+		return (buf);
 	}
-free(buf);
-return (cmd);
+free(buf), buf = NULL;
+return (buf);
 }
 
 /**

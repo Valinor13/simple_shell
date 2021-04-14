@@ -20,7 +20,7 @@ extern char **environ;
 void _prompt1(void);
 void _prompt2(void);
 void _prompt3(void);
-char *read_line(int *ln_cnt);
+char *read_line(void);
 int _putchar(char c);
 char *_memcpy(char *dest, char *src, size_t n);
 int _strcmp(char *s1, char *s2);
