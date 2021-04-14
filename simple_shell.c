@@ -21,7 +21,7 @@ int main(int ac, char *av[], char *env[])
 		count++;
 		if (mode)
 			_prompt1();
-		cmd = read_line(ln_cnt);
+		cmd = read_line();
 		/*effectively getline, including line count*/
 		if (cmd == NULL)
 		{
@@ -46,7 +46,7 @@ int main(int ac, char *av[], char *env[])
 			break;
 		}
 		ex_stat = _exec(tknptr, cmd, av, ln_cnt, ex_stat);
-		free(tknptr), free(cmd);
+		free(tknptr), tknptr = NULL, free(cmd), cmd = NULL;
 	}
 	exit(ex_stat);
 }
