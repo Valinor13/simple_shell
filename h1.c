@@ -105,9 +105,12 @@ return (1);
  * get_path - turns input of tkn path into string
  * @pthtok: tokenized 2d array of the path
  * @tknptr: tokenized array of the user's input
+ * @av: program name in arg vector
+ * @cmd: original getline pointer
+ * @tpth: temp path
  * Return: new tknptr, with stat checked functionality
  */
-char *get_path(char **pthtok, char **tknptr)
+char *get_path(char **pthtok, char **tknptr, char **av, char *cmd, char *tpth)
 {
 	struct stat statvar;
 	int i;
@@ -128,7 +131,14 @@ char *get_path(char **pthtok, char **tknptr)
 		if (tknptr[0] == NULL)
 			return (tmp);
 		if (stat(tknptr[0], &statvar) == 0)
+		{
+			if (access(tknptr[0], X_OK) == -1)
+			{
+				free(tknptr[0]), free(tknptr), free(cmd), free(tpth);
+				free(pthtok), perror(av[0]), exit(126);
+			}
 			break;
+		}
 		/*stat(0) == success, we break. If it fails, we try again*/
 		free(tknptr[0]);
 		tknptr[0] = tmp;
