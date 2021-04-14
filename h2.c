@@ -6,7 +6,6 @@
  * @s2: the second
  * Return: the measure
  */
-
 int _strcmp(char *s1, char *s2)
 {
 	int y, x;
@@ -33,15 +32,15 @@ return (x);
  *
  * Return: the length(x)
  */
-
 size_t _strlen(char *s)
 {
 size_t x;
-x = 0;
-while (*(s + x) != '\0')
-{
-x++;
-}
+
+	x = 0;
+	while (*(s + x) != '\0')
+	{
+		x++;
+	}
 return (x);
 }
 
@@ -65,34 +64,13 @@ return (dest);
 }
 
 /**
- * _puts - print a string
- * @str: the string
- * Return: nada
+ * handler - handles signals
+ * @num: input null arg
+ * Return: returns void
  */
-
-void _puts(char *str)
+void handler(int num)
 {
-int x;
-if (str == NULL)
-return;
-for (x = 0; str[x] != '\0'; x++)
-{
-_putchar(str[x]);
-}
-_putchar('\n');
-return;
+	(void)num;
+	write(STDOUT_FILENO, "\n$ ", 3);
 }
 
-/**
- * _putchar - writes the character c to stdout
- * @c: The character to print
- *
- * Return: On success 1.
- * On error, -1 is returned, and errno is set appropriately.
- */
-int _putchar(char c)
-{
-	size_t n = 1;
-
-return (write(STDOUT_FILENO, &c, n));
-}

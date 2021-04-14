@@ -1,10 +1,10 @@
 #include "shlib.h"
 /**
  * read_line - takes input and reads to the main file
- * @line_cnt: Exactly what it says it is
+ * @ln_cnt: Exactly what it says it is
  * Return:  returns a character string of the command
  */
-char *read_line(int *line_cnt)
+char *read_line(int *ln_cnt)
 {
 	char *buf = NULL, *cmd = NULL;
 	size_t bsz = 1024, ptrlen = 0;
@@ -40,7 +40,7 @@ char *read_line(int *line_cnt)
 			return (cmd);
 		}
 		buflen -= 2, cmd[ptrlen + buflen] = 00, _prompt2();
-		*line_cnt += 1, ptrlen += buflen;
+		*ln_cnt += 1, ptrlen += buflen;
 	}
 free(buf);
 return (cmd);
@@ -109,27 +109,29 @@ return (1);
  */
 char *get_path(char **pthtok, char **tknptr)
 {
-  struct stat statvar;
-  int i;
-  char *tmp = NULL;
+	struct stat statvar;
+	int i;
+	char *tmp = NULL;
 
-  tmp = tknptr[0];
-  for (i = 0; pthtok[i] != NULL; i++)
-    {
-      pthtok[i] = _strcat(pthtok[i], "/");
-      /*appends tkn input w/ '/' to run stat*/
-      if (pthtok[i] == NULL)
-	return (tknptr[0]);
-      tknptr[0] = _strcat(pthtok[i], tknptr[0]);
-      /*Read with '/', append new string with user command*/
-      free(pthtok[i]);
-      if (tknptr[0] == NULL)
-	return (tknptr[0]);
-      if (stat(tknptr[0], &statvar) == 0)
-	break;
-      /*stat(0) == success, we break. If it fails, we try again*/
-      free(tknptr[0]);
-      tknptr[0] = tmp;
-    }
-  return (tknptr[0]);
+	tmp = tknptr[0];
+	if (tmp == NULL)
+		return (pthtok[0]);
+	for (i = 0; pthtok[i] != NULL; i++)
+	{
+		pthtok[i] = _strcat(pthtok[i], "/");
+		/*appends tkn input w/ '/' to run stat*/
+		if (pthtok[i] == NULL)
+			return (tmp);
+		tknptr[0] = _strcat(pthtok[i], tknptr[0]);
+		/*Read with '/', append new string with user command*/
+		free(pthtok[i]);
+		if (tknptr[0] == NULL)
+			return (tmp);
+		if (stat(tknptr[0], &statvar) == 0)
+			break;
+		/*stat(0) == success, we break. If it fails, we try again*/
+		free(tknptr[0]);
+		tknptr[0] = tmp;
+	}
+return (tknptr[0]);
 }

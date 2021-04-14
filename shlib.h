@@ -15,10 +15,12 @@
 #include <stdarg.h>
 #include <stddef.h>
 
+extern char **environ;
+
 void _prompt1(void);
 void _prompt2(void);
 void _prompt3(void);
-char *read_line(int *line_cnt);
+char *read_line(int *ln_cnt);
 int _putchar(char c);
 char *_memcpy(char *dest, char *src, size_t n);
 int _strcmp(char *s1, char *s2);
@@ -31,12 +33,13 @@ char *_strdup(char *str);
 char *_strcat(char *dest, char *src);
 char *get_path(char **pthtok, char **tknptr);
 char *_gwd(char *tmpth);
-int _exec(char **tknptr, char *cmd, char *av[], char *env[], int *line_cnt, int exit_status);
+int _exec(char **tknptr, char *cmd, char *av[], int *ln_cnt, int ex_stat);
 char *_strcpyr(char *dest, char *src, size_t ptrlen);
-void _pterror(char **av, char **tknptr, int *line_cnt);
-char *printint(int *line_cnt);
+void _pterror(char **av, char **tknptr, int *ln_cnt);
+char *printint(int *ln_cnt);
 size_t _charcmp(char *tknptr, char slash);
-char *get_tknptr(char *env[], char *av[], char *tknptr[], char *cmd);
-void handler(int num);
+char *get_tknptr(char *av[], char *tknptr[], char *cmd);
 char **_tokenize(char *cmd, char *av[]);
+void handler(int num);
+
 #endif
