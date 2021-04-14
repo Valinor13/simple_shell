@@ -74,3 +74,30 @@ void handler(int num)
 	write(STDOUT_FILENO, "\n$ ", 3);
 }
 
+/**
+ * _tokenize - space saver
+ * @cmd: uh huh
+ * @av: program name and arg vector
+ * Return: tokenized string
+ */
+char **_tokenize(char *cmd, char *av[])
+{
+size_t tkncnt, i;
+char *cntptr = NULL, **tknptr = NULL;
+
+cntptr = _strdup(cmd);
+if (cntptr == NULL)
+perror(av[0]), free(cmd), exit(EXIT_FAILURE);
+tkncnt = get_tkncnt(cntptr, " "), tknptr = malloc(sizeof(char *) * tkncnt);
+
+if (tknptr == NULL)
+perror(av[0]), free(cmd), exit(EXIT_FAILURE);
+tknptr[0] = strtok(cmd, " ");
+
+for (i = 1; i < tkncnt - 1; i++)
+tknptr[i] = strtok(NULL, " ");
+
+tknptr[i] = NULL;
+
+return (tknptr);
+}
