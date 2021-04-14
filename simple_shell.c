@@ -11,18 +11,16 @@ int main(int ac, char *av[], char *env[])
 {
 	char *cmd = NULL, **tknptr = NULL;
 	size_t mode;
-	int count = 0, *ln_cnt = &count, ex_stat = 0;
+	int count = 0, *ln_cnt = &count, ex_stat = 0, esig;
 
 	(void)ac, (void)env;
 	signal(SIGINT, handler), mode = isatty(STDIN_FILENO);
-	/*isatty answers if input is waiting, terminal up*/
 	while (1)
 	{
 		count++;
 		if (mode)
 			_prompt1();
 		cmd = read_line();
-		/*effectively getline, including line count*/
 		if (cmd == NULL)
 		{
 			if (mode)
@@ -40,11 +38,17 @@ int main(int ac, char *av[], char *env[])
 			free(cmd), free(tknptr);
 			continue;
 		}
-		if (_strcmp(tknptr[0], "exit") == 0)
+/*		if (_strcmp(tknptr[0], "exit") == 0)
 		{
 			free(cmd), free(tknptr);
 			break;
 		}
+*/
+		esig = bltcheck(tknptr, cmd, ex_stat);
+		if (esig == 2)
+		  break;
+		if (esig == 1)
+		  continue;
 		ex_stat = _exec(tknptr, cmd, av, ln_cnt, ex_stat);
 		free(tknptr), tknptr = NULL, free(cmd), cmd = NULL;
 	}
@@ -81,7 +85,8 @@ int _exec(char **tknptr, char *cmd, char *av[], int *ln_cnt, int ex_stat)
 			free(tknptr), free(cmd);
 			perror(av[0]), exit(126);
 		}
-		execve(tknptr[0], tknptr, environ);
+		if (execve(tknptr[0], tknptr, environ) == -1)
+			free(cmd), free(tknptr), perror(av[0]), exit(1); 
 	}
 	/*Child path will either always find the path or not*/
 	/*Parent process will wait until child is NULL value, then return*/
@@ -194,29 +199,48 @@ char *get_tknptr(char *av[], char *tknptr[], char *cmd)
 
 /**
  * _tokenize - space saver
- * @cmd: uh huh
- * @av: program name and arg vector
- * Return: tokenized string
- */
-char **_tokenize(char *cmd, char *av[])
+ * @cmd: 
+ * @av: 
+ * Return: 
+*/
+
+int bltcheck(char **tknptr, char *cmd, int ex_stat)
 {
-	size_t tkncnt, i;
-	char *cntptr = NULL, **tknptr = NULL;
+pid_t pidy = getpid();
+int esig = 0, i = 0, len, *pidyptr = &pidy, *ex_st = &ex_stat;
+char *tmpo;
 
-	cntptr = _strdup(cmd);
-
-	if (cntptr == NULL)
-		perror(av[0]), free(cmd), exit(EXIT_FAILURE);
-	tkncnt = get_tkncnt(cntptr, " "), tknptr = malloc(sizeof(char *) * tkncnt);
-
-	if (tknptr == NULL)
-		perror(av[0]), free(cmd), exit(EXIT_FAILURE);
-	tknptr[0] = strtok(cmd, " ");
-
-	for (i = 1; i < tkncnt - 1; i++)
-		tknptr[i] = strtok(NULL, " ");
-
-	tknptr[i] = NULL;
-
-return (tknptr);
+if (_strcmp(tknptr[0], "exit") == 0)
+esig = 2;
+else if (_strcmp(tknptr[0], "env") == 0)
+{
+for (i = 0; environ[i] != NULL; i++)
+{
+len = _strlen(environ[i]), esig = 1;
+write(STDOUT_FILENO, environ[i], len), write(STDOUT_FILENO, "\n", 1);
+}
+}
+else if (_strcmp(tknptr[0], "echo") == 0)
+{
+if (tknptr[1])
+{
+if (_strcmp(tknptr[1], "$$") == 0)
+{
+esig = 1, tmpo = printint(pidyptr), len = _strlen(tmpo);
+write(STDOUT_FILENO, tmpo, len), write(STDOUT_FILENO, "\n", 1);
+free(tmpo);
+}
+else if (_strcmp(tknptr[1], "$?") == 0)
+{
+esig = 1, tmpo = printint(ex_st), len = _strlen(tmpo);
+write(STDOUT_FILENO, tmpo, len), write(STDOUT_FILENO, "\n", 1);
+free(tmpo);
+}
+}
+}
+if (esig == 1 || esig == 2)
+{
+free(cmd), free(tknptr), cmd = NULL, tknptr = NULL;
+}
+return (esig);
 }
