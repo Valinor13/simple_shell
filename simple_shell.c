@@ -38,17 +38,11 @@ int main(int ac, char *av[], char *env[])
 			free(cmd), free(tknptr);
 			continue;
 		}
-/*		if (_strcmp(tknptr[0], "exit") == 0)
-		{
-			free(cmd), free(tknptr);
-			break;
-		}
-*/
 		esig = bltcheck(tknptr, cmd, ex_stat);
 		if (esig == 2)
-		  break;
+			break;
 		if (esig == 1)
-		  continue;
+			continue;
 		ex_stat = _exec(tknptr, cmd, av, ln_cnt, ex_stat);
 		free(tknptr), tknptr = NULL, free(cmd), cmd = NULL;
 	}
@@ -86,7 +80,7 @@ int _exec(char **tknptr, char *cmd, char *av[], int *ln_cnt, int ex_stat)
 			perror(av[0]), exit(126);
 		}
 		if (execve(tknptr[0], tknptr, environ) == -1)
-			free(cmd), free(tknptr), perror(av[0]), exit(1); 
+			free(cmd), free(tknptr), perror(av[0]), exit(1);
 	}
 	/*Child path will either always find the path or not*/
 	/*Parent process will wait until child is NULL value, then return*/
@@ -198,10 +192,11 @@ char *get_tknptr(char *av[], char *tknptr[], char *cmd)
 }
 
 /**
- * _tokenize - space saver
- * @cmd: 
- * @av: 
- * Return: 
+ * bltcheck - checks built in commands
+ * @cmd: the input
+ * @tknptr: tokenized string
+ * @ex_stat: exit status
+ * Return: esig
 */
 
 int bltcheck(char **tknptr, char *cmd, int ex_stat)
