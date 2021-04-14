@@ -36,7 +36,8 @@ char *read_line(int *ln_cnt)
 		if (buflen == 1 || buf[buflen - 2] != '\\')
 		{
 			free(buf);
-			cmd[ptrlen + buflen - 1] = 00;
+			if (cmd[ptrlen + buflen - 1] == '\n')
+				cmd[ptrlen + buflen - 1] = 00;
 			return (cmd);
 		}
 		buflen -= 2, cmd[ptrlen + buflen] = 00, _prompt2();
