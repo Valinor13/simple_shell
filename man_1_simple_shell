@@ -2,7 +2,7 @@
 .SH NAME
 simple shell - environment used to take input as argument and print to standard out
 .SH SYNOPSIS
-.B behavior is defined by 
+.B behavior is defined by
 [\fb\-\-ARGUMENT\fr]
 [\fb\-\-FORMAT\fr]
 .SH DESCRIPTION

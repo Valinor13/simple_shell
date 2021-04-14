@@ -1,7 +1,7 @@
 #include "shlib.h"
 
 /**
- * print_prompt1 - prints $
+ * _prompt1 - prints $
  * Return: returns void
  */
 void _prompt1(void)
@@ -10,7 +10,7 @@ void _prompt1(void)
 }
 
 /**
- * print_prompt2 - prints >
+ * _prompt2 - prints >
  * Return: returns void
  */
 void _prompt2(void)
@@ -19,7 +19,7 @@ void _prompt2(void)
 }
 
 /**
- * print_prompt3 - prints #
+ * _prompt3 - prints #
  * Return: returns void
  */
 void _prompt3(void)
@@ -27,12 +27,19 @@ void _prompt3(void)
 	write(STDOUT_FILENO, "# ", 2);
 }
 
-void _pterror(char **av, char **tknptr, int *line_cnt)
+/**
+ * _pterror - prints an error message
+ * @av: program name
+ * @tknptr: path and command
+ * @ln_cnt: line counts
+ * Return: returns void
+ */
+void _pterror(char **av, char **tknptr, int *ln_cnt)
 {
 	int i;
 	char *tmp = NULL, *tmp2 = NULL, *cnt = NULL;
 
-	cnt = printint(line_cnt);
+	cnt = printint(ln_cnt);
 	tmp = _strcat(av[0], ": ");
 	tmp2 = _strcat(tmp, cnt);
 	free(cnt), free(tmp), tmp = NULL;
@@ -50,11 +57,11 @@ return;
 
 /**
 * printint - Conveting integer data to a string
-* @line_cnt: pointer to total line count
+* @ln_cnt: pointer to total line count
 *
 * Return: pointer to string of numeric characters
 */
-char *printint(int *line_cnt)
+char *printint(int *ln_cnt)
 {
 	char *tmp;
 	unsigned int neg;
@@ -63,7 +70,7 @@ char *printint(int *line_cnt)
  * iterator, last digit, initial integer, copy of initial integer,
  * length of input, length for negatives
  */
-	n = *line_cnt;
+	n = *ln_cnt;
 	num = n;
 	len = i = 0;
 	while (n != 0)	/** Integer length */
