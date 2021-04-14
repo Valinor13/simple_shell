@@ -1,13 +1,14 @@
 .TH man_1_simple_shell
 .SH NAME
-simple shell - environment used to take input as argument and print to standard out
+holbie shell - environment used to take input as argument and print to standard out
 .SH SYNOPSIS
-.B behavior is defined by
-[\fb\-\-ARGUMENT\fr]
-[\fb\-\-FORMAT\fr]
+.B output is defined by
+[\fbACTION\fr]
+[\fbOPTIONS\fr]
+[\fbFILE/DIRECTORY\fr]
 .SH DESCRIPTION
-.B simple shell -
- /hsh reads input from user and tokenizes it to pass it as an argument. Each subsequent input after the first is translated as a formatting variable. The tokens are read through the /bin/ in root. The shell then prints the results of all arguments into standard output.
+.B holbie shell -
+ /hsh reads input from user and tokenizes it to pass it as an argument. Each subsequent input after the first is translated as a formatting variable. The tokens are read through the $PATH in root. The shell then prints the results of all arguments into standard output.
 .SH
 .TP
 .BR cat "- " \fr
@@ -16,6 +17,10 @@ The shell prints a file from start to finish into standard output.
 .TP
 .BR echo "- " \fr
 The shell repeats user input into standard output.
+.SH
+.TP
+.BR env "- " \fr
+The shell prints out a list of environment variables.
 .SH
 .TP
 .BR exit "- " \fr
@@ -27,7 +32,7 @@ The shell reports the contents of the current working directory.
 .SH
 .TP
 .BR mv "- " \fr
-The shell renames a file. Usage: "mv womp.c bang.sh" changes a file named "womp.c" into "bang.sh"
+The shell renames a file. Usage: "mv womp.c bang.sh" changes a file named "womp.c" into "bang.sh".
 .SH
 .TP
 .BR pwd "- " \fr
