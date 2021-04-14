@@ -62,6 +62,7 @@ int main(int ac, char *av[], char *env[])
  */
 int _exec(char **tknptr, char *cmd, char *av[], int *ln_cnt, int ex_stat)
 {
+	struct stat statvar;
 	pid_t pid = fork();
 	int status;
 
@@ -70,16 +71,17 @@ int _exec(char **tknptr, char *cmd, char *av[], int *ln_cnt, int ex_stat)
 	if (pid == 0)
 	{
 		tknptr[0] = get_tknptr(av, tknptr, cmd);
+		if (stat(tknptr[0], &statvar) == -1)
+		{
+			_pterror(av, tknptr, ln_cnt);
+			free(tknptr), free(cmd),  exit(127);
+		}
 		if (access(tknptr[0], X_OK) == -1)
 		{
 			free(tknptr), free(cmd);
 			perror(av[0]), exit(126);
 		}
-		if (execve(tknptr[0], tknptr, environ) == -1)
-		{
-			_pterror(av, tknptr, ln_cnt);
-			free(tknptr), free(cmd),  exit(127);
-		}
+		execve(tknptr[0], tknptr, environ);
 	}
 	/*Child path will either always find the path or not*/
 	/*Parent process will wait until child is NULL value, then return*/
@@ -184,7 +186,7 @@ char *get_tknptr(char *av[], char *tknptr[], char *cmd)
 			/*strtok convert delim arg into first arg, tokenizes tknptr, end at 00*/
 				pthtok[i] = strtok(NULL, ":");
 			/*Append a NULL pointer to end of tokens*/
-			pthtok[i] = NULL, tknptr[0] = get_path(pthtok, tknptr);
+			pthtok[i] = NULL, tknptr[0] = get_path(pthtok, tknptr, av, cmd, tmpth);
 			free(tmpth), free(pthtok);
 		}
 	return (tknptr[0]);

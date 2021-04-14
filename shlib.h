@@ -31,7 +31,7 @@ char *_strcpy(char *dest, char *src, size_t ptrlen);
 size_t get_tkncnt(char *str, char *delim);
 char *_strdup(char *str);
 char *_strcat(char *dest, char *src);
-char *get_path(char **pthtok, char **tknptr);
+char *get_path(char **pthtok, char **tknptr, char **av, char *cmd, char *tpth);
 char *_gwd(char *tmpth);
 int _exec(char **tknptr, char *cmd, char *av[], int *ln_cnt, int ex_stat);
 char *_strcpyr(char *dest, char *src, size_t ptrlen);
