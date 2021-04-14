@@ -1,7 +1,6 @@
 #include "shlib.h"
 /**
  * read_line - takes input and reads to the main file
- * @ln_cnt: Exactly what it says it is
  * Return:  returns a character string of the command
  */
 char *read_line(void)
