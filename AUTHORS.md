@@ -4,9 +4,11 @@
 |-------------------|
 |Jay Calhoun        |
 |Christopher Caswell|
-|...                |
+|                   |
 |       |
 
 
 ##### Any revision can be sent to
 >christopher.caswell@rocketmail.com
+>  or
+>jwcalhoun2@gmail.com
