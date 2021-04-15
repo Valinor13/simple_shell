@@ -84,19 +84,26 @@ char **_tokenize(char *cmd, char *av[])
 size_t tkncnt, i;
 char *cntptr = NULL, **tknptr = NULL;
 
-cntptr = _strdup(cmd);
-if (cntptr == NULL)
-perror(av[0]), free(cmd), exit(EXIT_FAILURE);
-tkncnt = get_tkncnt(cntptr, " "), tknptr = malloc(sizeof(char *) * tkncnt);
+	cntptr = _strdup(cmd);
+	if (cntptr == NULL)
+		perror(av[0]), free(cmd), exit(EXIT_FAILURE);
 
-if (tknptr == NULL)
-perror(av[0]), free(cmd), exit(EXIT_FAILURE);
-tknptr[0] = strtok(cmd, " ");
+	tkncnt = get_tkncnt(cntptr, " ");
+	tknptr = malloc(sizeof(char *) * tkncnt);
 
-for (i = 1; i < tkncnt - 1; i++)
-tknptr[i] = strtok(NULL, " ");
+	if (tknptr == NULL)
+		perror(av[0]), free(cmd), exit(EXIT_FAILURE);
+	tknptr[0] = strtok(cmd, " ");
+	if (tknptr[0] == NULL)
+	{
+		free(tknptr);
+		return (NULL);
+	}
 
-tknptr[i] = NULL;
+	for (i = 1; i < tkncnt - 1; i++)
+		tknptr[i] = strtok(NULL, " ");
+
+	tknptr[i] = NULL;
 
 return (tknptr);
 }

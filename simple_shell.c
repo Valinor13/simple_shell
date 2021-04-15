@@ -33,7 +33,7 @@ int main(int ac, char *av[], char *env[])
 			continue;
 		}
 		tknptr = _tokenize(cmd, av);
-		if (tknptr[0] == NULL)
+		if (tknptr == NULL || tknptr[0] == NULL)
 		{
 			free(cmd), free(tknptr);
 			continue;
