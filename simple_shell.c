@@ -156,7 +156,7 @@ char *get_tknptr(char *av[], char *tknptr[], char *cmd)
 		for (i = 0; environ[i]; i++)
 		{
 		/*When the function succesfully finds  PATH= in the env*/
-			if (_strcmp("PATH=", environ[i]) == 0)
+			if (_strcmp2("PATH=", environ[i]) == 0)
 				break;
 		}
 		if (environ[i] != NULL && _charcmp(tknptr[0], '/') != 0)
