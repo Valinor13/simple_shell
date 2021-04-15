@@ -155,32 +155,31 @@ char *get_tknptr(char *av[], char *tknptr[], char *cmd)
 
 		for (i = 0; environ[i]; i++)
 		{
-		/*When the function succesfully finds  PATH= in the env*/
 			if (_strcmp2("PATH=", environ[i]) == 0)
 				break;
 		}
 		if (environ[i] != NULL && _charcmp(tknptr[0], '/') != 0)
 		{
-			/*if we find PATH:*/
+			/*if we find PATH: in env*/
 			len = _strlen(environ[i]);
 			tmpth = malloc(sizeof(char) * len - 4);
 			if (tmpth == NULL)
-			/*tmpth = temporary path*/
-			/*perror prints num of sys call associated w/ fail*/
 				perror(av[0]), free(cmd), free(tknptr), exit(EXIT_FAILURE);
 			/*copies "PATH=..." into beginning of string at array point 5*/
 			tmpth = _strcpyr(tmpth, environ[i], 5);
 			/*Adds the current working directory to the path, if necessary*/
-			tmpth = _gwd(tmpth);
-			/*npth = new path*/
-			npth = _strdup(tmpth);
+			tmpth = _gwd(tmpth), npth = _strdup(tmpth);
 			if (npth == NULL)
 				perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
-			pthcnt = get_tkncnt(npth, ":");
-			pthtok = malloc(sizeof(char *) * pthcnt);
+			pthcnt = get_tkncnt(npth, ":"), pthtok = malloc(sizeof(char *) * pthcnt);
 			if (pthtok == NULL)
 				perror(av[0]), free(tmpth), free(cmd), free(tknptr), exit(EXIT_FAILURE);
 			pthtok[0] = strtok(tmpth, ":");
+			if ((pthtok[0][0] ! = ":" || phtok[0][0] != "/") || pthtok[0] == NULL)
+			  {
+			    free(pthtok), free(tmpth);
+			    return (tknptr[0]);
+			  }
 			for (i = 1; i < (pthcnt - 1); i++)
 			/*strtok convert delim arg into first arg, tokenizes tknptr, end at 00*/
 				pthtok[i] = strtok(NULL, ":");
