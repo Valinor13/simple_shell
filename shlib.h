@@ -42,5 +42,6 @@ char *get_tknptr(char *av[], char *tknptr[], char *cmd);
 char **_tokenize(char *cmd, char *av[]);
 void handler(int num);
 int bltcheck(char **tknptr, char *cmd, int ex_stat);
+int _strcmp2(char *s1, char *s2);
 
 #endif
